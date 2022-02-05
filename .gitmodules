@@ -1,0 +1,12 @@
+[submodule "external/glfw"]
+	path = external/glfw
+	url = https://github.com/glfw/glfw
+[submodule "external/Nuklear"]
+	path = external/Nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear
+[submodule "external/tinyobjloader"]
+	path = external/tinyobjloader
+	url = https://github.com/tinyobjloader/tinyobjloader
+[submodule "external/glog"]
+	path = external/glog
+	url = https://github.com/google/glog
