@@ -9,8 +9,23 @@ class Framebuffer {
 	public:
 		Framebuffer() {};
 		~Framebuffer();
+		/**
+		 * Initialize the framebuffer by creating the texture and the uint32_t array that will store the pixel data.
+		 *
+		 * @param w The width of the final image;
+		 * @param h The height of the final image;
+		 */
 		void init(uint64_t w, uint64_t h);
+		/**
+		 * Put a pixel in the Framebuffer.
+		 * @param idx The index at which the color should be stored. Should be equal to width * y + x;
+		 * @param color The color that must be put on screen.
+		 */
 		void putPixel(uint64_t idx, const glm::vec3 &color);
+
+		/**
+		 * Pass the textured quad to the rendering pipeline;
+		 */
 		void present();
 
 	private:
