@@ -3,6 +3,7 @@
 
 class Sampler {
 	public:
+		virtual float getSample() = 0;
 	protected:
 };
 

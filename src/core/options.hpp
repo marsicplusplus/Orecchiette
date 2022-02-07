@@ -7,6 +7,11 @@ class Options {
 	public:
 		Options();
 		Options(std::string fp);
+		
+		std::string title;
+		int width, height;
+		int tileW, tileH;
+		int spp;
 };
 
 #endif // __OPTIONS_HPP__
