@@ -6,11 +6,14 @@
 class Options {
 	public:
 		Options();
-		Options(std::string fp);
 		
+		void parseFromFile(std::string fp);
+
 		std::string title;
 		int width, height;
 		int tileW, tileH;
+		int scaling;
+		int nThreads;
 		int spp;
 };
 
