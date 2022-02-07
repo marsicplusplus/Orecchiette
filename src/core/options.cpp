@@ -14,7 +14,6 @@ Options::Options() {
 }
 
 void Options::parseFromFile(std::string fp) {
-	Options();
 	std::ifstream config(fp);
 	std::string line;
 	while(std::getline(config, line)){

@@ -1,6 +1,8 @@
 # Orecchiette
 Real Time Path Tracer 
 
+[Trello Board](https://trello.com/b/gVuxBGSr/orecchiette)
+
 Some useful references and papers:
 - [Mitsuba renderer documentation](https://mitsuba2.readthedocs.io/en/latest/index.html)
 - [PBR](https://pbr-book.org/3ed-2018/)
