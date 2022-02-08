@@ -4,12 +4,19 @@
 #include <glm/geometric.hpp>
 #include "glm/vec2.hpp"
 #include "glm/vec3.hpp"
+#include "glm/mat4x4.hpp"
 
 class Ray {
 	public:
 		Ray();
 		Ray(glm::vec3 origin, glm::vec3 direction);
 		glm::vec3 at(float t) const;
+
+		/*
+		 * @param transform
+		 * @return a ray transformed by the transformation matrix;
+		 */
+		Ray transformRay(const glm::mat4 &transform) const;
 
 		glm::vec3 origin;
 		glm::vec3 direction;

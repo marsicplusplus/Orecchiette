@@ -28,6 +28,7 @@ set( SRC
 	 src/core/ray.cpp
 	 src/core/transform.cpp
 	 src/core/options.cpp
+	 src/primitives/sphere.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
 	 src/orecchiette.cpp

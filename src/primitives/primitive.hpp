@@ -6,10 +6,11 @@
 
 class Primitive {
 	public:
-		Primitive(const Transform &obj2world);
-		bool hit(const Ray &ray, const HitRecord& hr);
-	private:
+		Primitive(const Transform &obj2world, int material = 0) : obj2world(obj2world), material(material) {}
+		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const = 0;
+	protected:
 		Transform obj2world;
+		int material;
 };
 
 #endif
