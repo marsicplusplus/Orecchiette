@@ -2,7 +2,7 @@
 #define __SCENE_HPP__
 
 #include "primitives/primitive.hpp"
-#include "lights/light_object.hpp"
+#include "emitters/emitter.hpp"
 #include "cameras/camera.hpp"
 #include "core/defs.hpp"
 #include "textures/texture.hpp"
@@ -37,7 +37,7 @@ class Scene {
 
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
-		std::vector<std::shared_ptr<LightObject>> lights;
+		std::vector<std::shared_ptr<Emitter>> lights;
 		//std::vector<std::shared_ptr<Material>> materials;
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::shared_ptr<Camera> camera;
