@@ -19,7 +19,7 @@ cmake .. -DCMAKE_BUILD_TYPE=debug
 make
 ```
 ### Windows
-Visual Studio should be able to parse the CMake file and create the solution file accordingly.
+Visual Studio should be able to parse the CMake file and create the solution files accordingly.
 Please add to the .gitignore any file/folder created by VS that's not in there already to avoid pushing them by mistake.
 
 # Contribution guidelines
