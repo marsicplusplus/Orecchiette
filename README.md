@@ -1,5 +1,27 @@
 # Orecchiette
-Real Time Path Tracer 
+Real Time Path Tracer, please read this README!
+
+<img src="https://cdn.shopify.com/s/files/1/0507/3872/5039/products/orecchiette-italian-pasta-fresh-egg-amsterdam-pasta-gael-home-made-only-cheese-gluten-free_2048x2048.jpg" alt="a" width="200"/>
+
+# Clone and build
+
+Clone with all the submodules using 
+
+`git clone git@github.com:marsicplusplus/Orecchiette.git --recursive`
+
+### Linux
+
+```
+cd Orecchiette
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=debug
+make
+```
+### Windows
+Visual Studio should be able to parse the CMake file and create the solution file accordingly.
+Please add to the .gitignore any file/folder created by VS that's not in there already to avoid pushing them by mistake.
+
 # Contribution guidelines
 
 We are all friends here, but let's try and keep this thing civil to avoid destroying each other code!
