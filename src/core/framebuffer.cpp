@@ -82,10 +82,19 @@ void Framebuffer::init(uint64_t w, uint64_t h){
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
 	this->buffer = new uint32_t[this->width * this->height];
+	this->accumulator = new Color[this->width * this->height];
 }
 
-void Framebuffer::putPixel(uint64_t idx, const glm::vec3 &color) {
-	unsigned char r = static_cast<unsigned char>(std::clamp(color.r, 0.0f, 0.999f) * 255.999f);
+void Framebuffer::putPixel(uint64_t idx, const glm::vec3 &color, uint64_t nFrames) {
+	Color newCol {
+			color.x + accumulator[idx].x * nFrames,
+			color.y + accumulator[idx].y * nFrames,
+			color.z + accumulator[idx].z * nFrames
+	};
+	newCol /= nFrames+1;
+	accumulator[idx] = newCol;
+
+	unsigned char r = static_cast<unsigned char>(std::clamp(newCol.r, 0.0f, 0.999f) * 255.999f);
 	unsigned char g = static_cast<unsigned char>(std::clamp(color.g, 0.0f, 0.999f) * 255.999f);
 	unsigned char b = static_cast<unsigned char>(std::clamp(color.b, 0.0f, 0.999f) * 255.999f);
 	buffer[idx] = r << 16 | g << 8 | b << 0;

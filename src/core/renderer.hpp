@@ -28,6 +28,7 @@ class Renderer{
 		Options opts;
 		std::shared_ptr<Sampler> sampler;
 		bool isInitialized;
+		uint64_t nFrames;
 };
 
 #endif //__RENDERER_HPP__

@@ -30,7 +30,8 @@ void Renderer::start(){
 			);
 	while(!glfwWindowShouldClose(this->window)){
 		glfwPollEvents();
-		for(int tileRow = 0; tileRow < verticalTiles; ++tileRow){
+		this->nFrames++;
+			for(int tileRow = 0; tileRow < verticalTiles; ++tileRow){
 			for(int tileCol = 0; tileCol < horizontalTiles; ++tileCol){
 				for (int row = 0; row < tHeight; ++row) {
 					for (int col = 0; col < tWidth; ++col) {
@@ -41,7 +42,7 @@ void Renderer::start(){
 						cam->getCameraRay(x, y, &ray, sampler);
 						auto t = 0.5f*(ray.direction.y + 1.0f);
 						auto color = (1.0f-t)*glm::vec3(1.0, 1.0, 1.0) + t*glm::vec3(0.5, 0.7, 1.0);
-						framebuffer.putPixel(idx, color);
+						framebuffer.putPixel(idx, color, nFrames);
 					}
 				}
 			}
@@ -67,9 +68,8 @@ bool Renderer::init() {
 	sampler = std::make_shared<XorShift>(time(NULL));
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;
+	nFrames = 0;
 	return isInitialized;
 }
 
-Renderer::~Renderer(){
-	glfwDestroyWindow(this->window);
-}
+Renderer::~Renderer(){}

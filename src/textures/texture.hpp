@@ -14,7 +14,7 @@ enum class TextureType {
 
 class Texture {
 	public:
-		Texture(const std::string &_name) : name(_name) {}
+		Texture(const std::string &name) : name(name) {}
 		virtual ~Texture() = 0;
 
 		virtual Color color(float u, float v, const glm::vec3 &p) const = 0;

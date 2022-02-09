@@ -1,6 +1,7 @@
 #ifndef __FRAMEBUFFER_HPP__
 #define __FRAMEBUFFER_HPP__
 
+#include "core/defs.hpp"
 #include "glm/vec3.hpp"
 
 #include <cstdint>
@@ -20,8 +21,9 @@ class Framebuffer {
 		 * Put a pixel in the Framebuffer.
 		 * @param idx The index at which the color should be stored. Should be equal to width * y + x;
 		 * @param color The color that must be put on screen.
+		 * @param nFrames the number of frames rendered so far, used for average the accumulator; 
 		 */
-		void putPixel(uint64_t idx, const glm::vec3 &color);
+		void putPixel(uint64_t idx, const glm::vec3 &color, uint64_t nFrames);
 
 		/**
 		 * Pass the textured quad to the rendering pipeline;
@@ -35,6 +37,7 @@ class Framebuffer {
 		unsigned int shader;
 		unsigned int texture;
 		uint32_t *buffer;
+		Color *accumulator;
 };
 
 #endif // __FRAMEBUFFER_HPP__
