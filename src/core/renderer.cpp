@@ -1,6 +1,6 @@
 #include "glad/glad.h"
+#include "core/renderer.hpp"
 #include "glog/logging.h"
-#include "renderer.hpp"
 #include "samplers/xorshift.hpp"
 #include "cameras/perspective.hpp"
 

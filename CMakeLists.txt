@@ -15,6 +15,7 @@ include_directories(
 	external/glad/include
 	external/glm
 	src/
+	include/
 	)
 
 if( MSVC )
