@@ -2,9 +2,10 @@
 #define __RENDERER_HPP__
 
 #include "GLFW/glfw3.h"
+#include "samplers/sampler.hpp"
 #include "core/framebuffer.hpp"
 #include "core/options.hpp"
-#include "samplers/sampler.hpp"
+#include "core/scene.hpp"
 
 #include <string>
 #include <cstring>
@@ -22,11 +23,13 @@ class Renderer{
 
 	private:
 		void drawGUI();
+		Color trace(const Ray &ray);
 
 		GLFWwindow *window;
 		Framebuffer framebuffer;
 		Options opts;
 		std::shared_ptr<Sampler> sampler;
+		std::shared_ptr<Scene> scene;
 		bool isInitialized;
 		uint64_t nFrames;
 };

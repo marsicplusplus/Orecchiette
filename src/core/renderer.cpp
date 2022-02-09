@@ -32,24 +32,54 @@ void Renderer::start(){
 		glfwPollEvents();
 		this->nFrames++;
 			for(int tileRow = 0; tileRow < verticalTiles; ++tileRow){
-			for(int tileCol = 0; tileCol < horizontalTiles; ++tileCol){
-				for (int row = 0; row < tHeight; ++row) {
-					for (int col = 0; col < tWidth; ++col) {
-						int x = col + tWidth * tileCol;
-						int y = row + tHeight * tileRow;
-						int idx = wWidth * y + x;
-						Ray ray;
-						cam->getCameraRay(x, y, &ray, sampler);
-						auto t = 0.5f*(ray.direction.y + 1.0f);
-						auto color = (1.0f-t)*glm::vec3(1.0, 1.0, 1.0) + t*glm::vec3(0.5, 0.7, 1.0);
-						framebuffer.putPixel(idx, color, nFrames);
+				for(int tileCol = 0; tileCol < horizontalTiles; ++tileCol){
+					for (int row = 0; row < tHeight; ++row) {
+						for (int col = 0; col < tWidth; ++col) {
+							int x = col + tWidth * tileCol;
+							int y = row + tHeight * tileRow;
+							int idx = wWidth * y + x;
+							Ray ray;
+							Color color;
+							if(scene){
+								scene->getCamera()->getCameraRay(x, y, &ray, sampler);
+								color = trace(ray);
+							} else {
+								cam->getCameraRay(x, y, &ray, sampler);
+								auto t = 0.5f*(ray.direction.y + 1.0f);
+								color = (1.0f-t)*glm::vec3(1.0, 1.0, 1.0) + t*glm::vec3(0.5, 0.7, 1.0);
+							}
+							framebuffer.putPixel(idx, color, nFrames);
+						}
 					}
 				}
 			}
-		}
-		framebuffer.present();
-		glfwSwapBuffers(this->window);
+			framebuffer.present();
+			glfwSwapBuffers(this->window);
 	}
+}
+
+Color Renderer::trace(const Ray &ray){
+	Color t(1.0f, 1.0f, 1.0f);
+	Color e(1.0f, 1.0f, 1.0f);
+	Ray currentRay = ray;
+	while(1){
+		HitRecord hr;
+		if(scene->traverse(currentRay, EPS, INF, hr, sampler)){
+			auto material = scene->getMaterial(hr.materialIdx);
+			if(material->getType() == MaterialType::Emissive) break;
+			/* Sample a light for direct light */
+			/* Check if light is visible from hit point. Shade if that's the case by adding to e*/
+
+			/* Continue random walk for indirect light*/
+			/* Generate new direction, evaluate the brdf, importance sampling ecc...*/
+			/* ray = newRay;
+			 * Scale T as seen in the slides; (Russian Roulette lecture) 
+			 */
+		} else {
+			break;
+		}
+	}
+	return e;
 }
 
 bool Renderer::init() {
