@@ -3,7 +3,14 @@
 Sphere::Sphere(const Transform &o2w, float radius, int material) :
 	Primitive(o2w, material),
 	radius(radius) {
-	}
+	buildBBox();
+}
+
+
+void Sphere::buildBBox(){
+	localBB.min = {-this->radius, -this->radius, this->radius};
+	localBB.max = {this->radius, this->radius, -this->radius};
+}
 
 bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const {
 	auto r = ray.transformRay(obj2world.getInverse());

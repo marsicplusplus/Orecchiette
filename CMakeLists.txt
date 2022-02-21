@@ -31,6 +31,7 @@ set( SRC
 	 src/core/options.cpp
 	 src/core/scene.cpp
 	 src/primitives/sphere.cpp
+	 src/primitives/triangle.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
 	 src/orecchiette.cpp

@@ -5,11 +5,11 @@
 
 class Sphere : public Primitive {
 	public:
-
 		Sphere(const Transform &o2w, float radius, int material = 0);
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const override;
 
 	private:
+		void buildBBox() override;
 		float radius;
 };
 

@@ -3,6 +3,12 @@
 
 #include "core/ray.hpp"
 #include "core/transform.hpp"
+#include "emitters/emitter.hpp"
+
+struct BoundingBox {
+	glm::vec3 min = {INF, INF, INF};
+	glm::vec3 max = {-INF, -INF, -INF};
+};
 
 /* TODO 
  * Maybe having something along the line of PBR? 
@@ -11,11 +17,17 @@
  * */
 class Primitive {
 	public:
-		Primitive(const Transform &obj2world, int material = 0) : obj2world(obj2world), material(material) {}
+		Primitive() : obj2world(Transform()), material(0), emitter(nullptr) {}
+		Primitive(const Transform &obj2world, int material = 0, std::shared_ptr<Emitter> emitter = nullptr) : obj2world(obj2world), material(material), emitter(emitter) {}
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const = 0;
+
 	protected:
+		virtual void buildBBox() = 0;
+
 		Transform obj2world;
+		BoundingBox localBB;
 		int material;
+		std::shared_ptr<Emitter> emitter;
 };
 
 #endif
