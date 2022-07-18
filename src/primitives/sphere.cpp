@@ -33,5 +33,5 @@ bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& 
 	hr.point = obj2world.getMatrix() * glm::vec4(r.at(hr.t), 1.0f);
 	hr.setFaceNormal(r, obj2world.getTransposeInverse() * glm::vec4((hr.point) / radius, 1.0f));
 	hr.materialIdx = material;
-	return false;
+	return true;
 }

@@ -6,10 +6,11 @@
 #include "samplers/sampler.hpp"
 
 #include <memory>
-
+namespace Camera {
 class Camera {
 	public:
 		virtual void getCameraRay(float x, float y, Ray *ray, std::shared_ptr<Sampler> sampler) const = 0;
 	private:
 };
+}
 #endif

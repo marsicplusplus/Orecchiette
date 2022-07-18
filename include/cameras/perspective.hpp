@@ -3,6 +3,7 @@
 
 #include "cameras/camera.hpp"
 
+namespace Camera{
 class Perspective : public Camera {
 	public:
 		Perspective(glm::vec3 pos, glm::vec3 lookAt, const glm::vec2 &screenBound, float fov);
@@ -20,6 +21,7 @@ class Perspective : public Camera {
 		glm::vec2 sensorSize;
 		glm::vec2 screenBounds;
 		float aspectRatio;
+};
 };
 
 #endif // __PERSPECTIVE_HPP__

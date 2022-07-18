@@ -3,11 +3,16 @@
 #include "glog/logging.h"
 #include "samplers/xorshift.hpp"
 #include "cameras/perspective.hpp"
+#include <iostream>
 
 Renderer::Renderer(const Options &opt) : opts(opt){}
 
 void Renderer::setScene(std::string &fp) {
 
+}
+
+void Renderer::setScene(std::shared_ptr<Scene> scene) {
+	this->scene = scene;
 }
 
 void Renderer::drawGUI(){
@@ -22,12 +27,6 @@ void Renderer::start(){
 	const int horizontalTiles =  wWidth / tWidth;
 	const int verticalTiles = wHeight / tHeight;
 
-	std::unique_ptr<Camera> cam = std::make_unique<Perspective>(
-				glm::vec3{0.0f, 0.0f, 3.0f},
-				glm::vec3{0.0, 0.0, -1.0f},
-				glm::vec2{this->opts.width, this->opts.height},
-				90.0f
-			);
 	while(!glfwWindowShouldClose(this->window)){
 		glfwPollEvents();
 		this->nFrames++;
@@ -44,8 +43,7 @@ void Renderer::start(){
 								scene->getCamera()->getCameraRay(x, y, &ray, sampler);
 								color = trace(ray);
 							} else {
-								cam->getCameraRay(x, y, &ray, sampler);
-								auto t = 0.5f*(ray.direction.y + 1.0f);
+								auto t = 0.5f*(row + 1.0f);
 								color = (1.0f-t)*glm::vec3(1.0, 1.0, 1.0) + t*glm::vec3(0.5, 0.7, 1.0);
 							}
 							framebuffer.putPixel(idx, color, nFrames);
@@ -66,7 +64,8 @@ Color Renderer::trace(const Ray &ray){
 		HitRecord hr;
 		if(scene->traverse(currentRay, EPS, INF, hr, sampler)){
 			auto material = scene->getMaterial(hr.materialIdx);
-			if(material->getType() == MaterialType::Emissive) break;
+			//if(material->getType() == MaterialType::Emissive) break;
+			return Color(0.5f, 0.5f, 0.0f);
 			/* Sample a light for direct light */
 			/* Check if light is visible from hit point. Shade if that's the case by adding to e*/
 

@@ -1,15 +1,17 @@
 #include "cameras/perspective.hpp"
 
+namespace Camera {
 Perspective::Perspective(glm::vec3 pos, glm::vec3 lookAt, const glm::vec2 &screenBounds, float fov) :
 	origin(pos), screenBounds(screenBounds) {
 	this->aspectRatio = screenBounds.x / screenBounds.y;
-	this->sensorSize.x = 2.0f * tanf(glm::radians(fov) / 2.0f);
-	this->sensorSize.y = this->sensorSize.x / this->aspectRatio;
+	float h = tanf(glm::radians(fov)*0.5f);
+	this->sensorSize.y = 2.0f * h;
+	this->sensorSize.x = this->sensorSize.y * this->aspectRatio;
 
 	const glm::vec3 worldUp = glm::vec3{0.0f, 1.0f, 0.0f};
-	this->forward = glm::normalize(origin - lookAt);
-	this->right = glm::cross(worldUp, this->forward);
-	this->up = glm::cross(this->forward, this->right);
+	this->forward = glm::normalize(lookAt);
+	this->right = glm::cross(this->forward, worldUp);
+	this->up = glm::cross(this->right, this->forward);
 
 	origin = pos;
 	this->horizontal = this->sensorSize.x * right;
@@ -22,10 +24,11 @@ void Perspective::getCameraRay(float x, float y, Ray *ray, std::shared_ptr<Sampl
 	float jitterX = sampler->getSample();
 	float jitterY = sampler->getSample();
 	glm::vec2 uv = {
-		double(x) / (this->screenBounds.x-1),
-		double(y) / (this->screenBounds.y-1),
+		float(x) / (float)(this->screenBounds.x-1),
+		float(y) / (float)(this->screenBounds.y-1),
 	};
 	
 	ray->direction = this->llCorner + uv.x * this->horizontal + uv.y * this->vertical - this->origin;
 	ray->origin = this->origin;
 }
+};

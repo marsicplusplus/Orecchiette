@@ -37,14 +37,18 @@ class Scene {
 		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler);
 
 		const std::shared_ptr<Material> getMaterial(const uint64_t idx) const;
-		const std::shared_ptr<Camera> getCamera() const;
+
+		const std::shared_ptr<Camera::Camera> getCamera() const;
+		void setCamera(const std::shared_ptr<Camera::Camera> &cam);
+
+		void addPrimitive(const std::shared_ptr<Primitive> &p);
 
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
 		std::vector<std::shared_ptr<Emitter>> lights;
 		std::vector<std::shared_ptr<Material>> materials; /* I still don't know how to handle brfs and materials. Does a material have multiple bdrfs with different weights? */
 		std::vector<std::shared_ptr<Texture>> textures;
-		std::shared_ptr<Camera> camera;
+		std::shared_ptr<Camera::Camera> camera;
 };
 
 #endif

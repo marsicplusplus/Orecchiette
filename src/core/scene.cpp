@@ -1,4 +1,5 @@
 #include "core/scene.hpp"
+#include <iostream>
 
 Scene::Scene() {/*TODO empty/default scene?*/}
 Scene::Scene(const std::string &fp) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
@@ -24,6 +25,16 @@ const std::shared_ptr<Material> Scene::getMaterial(const uint64_t idx) const {
 	return materials[idx];
 }
 
-const std::shared_ptr<Camera> Scene::getCamera() const {
+void Scene::setCamera(const std::shared_ptr<Camera::Camera> &cam){
+	this->camera = cam;
+}
+
+const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 	return camera;
 }
+
+void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
+	primitives.push_back(p);
+}
+
+

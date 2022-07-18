@@ -20,6 +20,7 @@ class Renderer{
 		void start();
 
 		void setScene(std::string &fp);
+		void setScene(const std::shared_ptr<Scene> scene);
 
 	private:
 		void drawGUI();

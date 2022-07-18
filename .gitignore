@@ -1,2 +1,4 @@
 .ccls
 build/
+Debug/
+Release/
