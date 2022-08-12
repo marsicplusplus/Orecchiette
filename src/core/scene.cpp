@@ -1,7 +1,11 @@
 #include "core/scene.hpp"
+#include "materials/diffuse.hpp"
 #include <iostream>
 
-Scene::Scene() {/*TODO empty/default scene?*/}
+Scene::Scene() {/*TODO empty/default scene?*/
+	/* Create default empty material */
+	materials.emplace_back(std::make_shared<Mat::Diffuse>());
+}
 Scene::Scene(const std::string &fp) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
 
 bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler) {
@@ -20,7 +24,7 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 	return hasHit;
 }
 
-const std::shared_ptr<Material> Scene::getMaterial(const uint64_t idx) const {
+const std::shared_ptr<Mat::Material> Scene::getMaterial(const uint64_t idx) const {
 	if(idx < 0 || idx >= this->materials.size()) return nullptr;
 	return materials[idx];
 }

@@ -30,7 +30,10 @@ set( SRC
 	 src/core/transform.cpp
 	 src/core/options.cpp
 	 src/core/scene.cpp
+	 src/materials/diffuse.cpp
+	 src/materials/emissive.cpp
 	 src/primitives/sphere.cpp
+	 src/primitives/rect.cpp
 	 src/primitives/triangle.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp

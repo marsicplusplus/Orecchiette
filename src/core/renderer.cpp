@@ -64,8 +64,12 @@ Color Renderer::trace(const Ray &ray){
 		HitRecord hr;
 		if(scene->traverse(currentRay, EPS, INF, hr, sampler)){
 			auto material = scene->getMaterial(hr.materialIdx);
-			//if(material->getType() == MaterialType::Emissive) break;
-			return Color(0.5f, 0.5f, 0.0f);
+			if(material->getType() & Mat::MaterialType::EMISSIVE){
+				break;
+			} else if(material->getType() & Mat::MaterialType::DIFFUSE){
+				/* Sample lights in the scene */
+				return material->albedo;
+			}
 			/* Sample a light for direct light */
 			/* Check if light is visible from hit point. Shade if that's the case by adding to e*/
 

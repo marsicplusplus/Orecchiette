@@ -10,6 +10,7 @@ class Emitter {
 	public:
 		Emitter(const Transform &o2w, const std::shared_ptr<Texture> &emission) : 
 			o2w(o2w), emission(emission) {}
+		//virtual sample(const Ray &r);
 		/* TODO: 
 		 * We need:
 		 * 	- method to sample the emitter;

@@ -35,8 +35,9 @@ class Scene {
 		 * @return true if the ray intersects, false otherwhise.
 		 */
 		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler);
+		bool sampleLights(const HitRecord &hr, std::shared_ptr<Sampler> sampler);
 
-		const std::shared_ptr<Material> getMaterial(const uint64_t idx) const;
+		const std::shared_ptr<Mat::Material> getMaterial(const uint64_t idx) const;
 
 		const std::shared_ptr<Camera::Camera> getCamera() const;
 		void setCamera(const std::shared_ptr<Camera::Camera> &cam);
@@ -46,7 +47,7 @@ class Scene {
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
 		std::vector<std::shared_ptr<Emitter>> lights;
-		std::vector<std::shared_ptr<Material>> materials; /* I still don't know how to handle brfs and materials. Does a material have multiple bdrfs with different weights? */
+		std::vector<std::shared_ptr<Mat::Material>> materials; /* I still don't know how to handle brfs and materials. Does a material have multiple bdrfs with different weights? */
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::shared_ptr<Camera::Camera> camera;
 };
