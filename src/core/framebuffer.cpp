@@ -95,8 +95,8 @@ void Framebuffer::putPixel(uint64_t idx, const glm::vec3 &color, uint64_t nFrame
 	accumulator[idx] = newCol;
 
 	unsigned char r = static_cast<unsigned char>(std::clamp(newCol.r, 0.0f, 0.999f) * 255.999f);
-	unsigned char g = static_cast<unsigned char>(std::clamp(color.g, 0.0f, 0.999f) * 255.999f);
-	unsigned char b = static_cast<unsigned char>(std::clamp(color.b, 0.0f, 0.999f) * 255.999f);
+	unsigned char g = static_cast<unsigned char>(std::clamp(newCol.g, 0.0f, 0.999f) * 255.999f);
+	unsigned char b = static_cast<unsigned char>(std::clamp(newCol.b, 0.0f, 0.999f) * 255.999f);
 	buffer[idx] = r << 16 | g << 8 | b << 0;
 }
 

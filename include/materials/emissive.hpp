@@ -2,12 +2,9 @@
 #include "primitives/primitive.hpp"
 
 namespace Mat {
-	class Emissive { 
+	class Emissive : public Material { 
 		public:
-		Emissive(const std::shared_ptr<Primitive> &shape);
-		bool reflect(const Ray& in, const HitRecord &r, Ray &reflectedRay) const;
+		Emissive();
 		MaterialType getType() const;
-
-		std::shared_ptr<Primitive> shape;
 	};
 };

@@ -2,7 +2,7 @@
 
 class Rect : public Primitive {
 	public:
-		Rect(const Transform &obj2world, int material = 0, std::shared_ptr<Emitter> emitter = nullptr);
+		Rect(const Transform &obj2world, int material = 0);
 		bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const;
 
 };

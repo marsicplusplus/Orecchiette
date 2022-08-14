@@ -17,17 +17,18 @@ struct BoundingBox {
  * */
 class Primitive {
 	public:
-		Primitive() : obj2world(Transform()), material(0), emitter(nullptr) {}
-		Primitive(const Transform &obj2world, int material = 0, std::shared_ptr<Emitter> emitter = nullptr) : obj2world(obj2world), material(material), emitter(emitter) {}
+		Primitive() : obj2world(Transform()), material(0) {}
+		Primitive(const Transform &obj2world, int material = 0) : obj2world(obj2world), material(material){}
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const = 0;
+		virtual glm::vec3 sample(std::shared_ptr<Sampler> &sampler) const = 0;
+
+		int material;
 
 	protected:
 		virtual void buildBBox() = 0;
 
-		Transform obj2world;
 		BoundingBox localBB;
-		int material;
-		std::shared_ptr<Emitter> emitter;
+		Transform obj2world;
 };
 
 #endif

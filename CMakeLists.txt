@@ -30,6 +30,7 @@ set( SRC
 	 src/core/transform.cpp
 	 src/core/options.cpp
 	 src/core/scene.cpp
+	 src/emitters/area.cpp
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
 	 src/primitives/sphere.cpp

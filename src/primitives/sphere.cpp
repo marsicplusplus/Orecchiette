@@ -35,3 +35,22 @@ bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& 
 	hr.materialIdx = material;
 	return true;
 }
+
+glm::vec3 Sphere::sample(std::shared_ptr<Sampler> &sampler) const {
+	float u = sampler->getSample();
+	float v = sampler->getSample();
+	float theta = u * 2.0f * PI;
+	float phi = acos(2.0 * v - 1.0);
+	float r = cbrt(sampler->getSample());
+	float sinTheta = sin(theta);
+	float cosTheta = cos(theta);
+	float sinPhi = sin(phi);
+	float cosPhi = cos(phi);
+	float x = r * sinPhi * cosTheta;
+	float y = r * sinPhi * sinTheta;
+	float z = r * cosPhi;
+	glm::vec3 ret{x, y, z};
+
+	ret = (ret + this->obj2world.getTranslation()) * this->radius;
+	return ret;
+}

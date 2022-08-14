@@ -1,5 +1,6 @@
 #include "core/scene.hpp"
 #include "materials/diffuse.hpp"
+#include "emitters/area.hpp"
 #include <iostream>
 
 Scene::Scene() {/*TODO empty/default scene?*/
@@ -24,6 +25,14 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 	return hasHit;
 }
 
+bool Scene::sampleLights(const HitRecord &hr, std::shared_ptr<Sampler> sampler) {
+	return false;
+}
+
+void Scene::addMaterial(const std::shared_ptr<Mat::Material> &m) {
+	materials.emplace_back(m);
+}
+
 const std::shared_ptr<Mat::Material> Scene::getMaterial(const uint64_t idx) const {
 	if(idx < 0 || idx >= this->materials.size()) return nullptr;
 	return materials[idx];
@@ -38,6 +47,9 @@ const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 }
 
 void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
+	if(materials[p->material]->getType() == Mat::EMISSIVE){
+		lights.push_back(std::make_shared<Area>(p));
+	}
 	primitives.push_back(p);
 }
 

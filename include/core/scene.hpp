@@ -43,6 +43,9 @@ class Scene {
 		void setCamera(const std::shared_ptr<Camera::Camera> &cam);
 
 		void addPrimitive(const std::shared_ptr<Primitive> &p);
+		void addMaterial(const std::shared_ptr<Mat::Material> &m);
+		//void addLight(const std::shared_ptr<Primitive> &p);
+		//void addLight(const std::shared_ptr<Emitter> &e);
 
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;

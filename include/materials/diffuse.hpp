@@ -7,7 +7,6 @@ namespace Mat{
 			Diffuse();
 			MaterialType getType() const;
 
-			bool reflect(const Ray& in, const HitRecord &r, Ray &reflectedRay) const;
-
+			bool reflect(const Ray& in, Ray &reflectedRay, const HitRecord &r, std::shared_ptr<Sampler> &sampler) const;
 	};
 }

@@ -57,32 +57,20 @@ void Renderer::start(){
 }
 
 Color Renderer::trace(const Ray &ray){
-	Color t(1.0f, 1.0f, 1.0f);
-	Color e(1.0f, 1.0f, 1.0f);
-	Ray currentRay = ray;
-	while(1){
-		HitRecord hr;
-		if(scene->traverse(currentRay, EPS, INF, hr, sampler)){
-			auto material = scene->getMaterial(hr.materialIdx);
-			if(material->getType() & Mat::MaterialType::EMISSIVE){
-				break;
-			} else if(material->getType() & Mat::MaterialType::DIFFUSE){
-				/* Sample lights in the scene */
-				return material->albedo;
-			}
-			/* Sample a light for direct light */
-			/* Check if light is visible from hit point. Shade if that's the case by adding to e*/
-
-			/* Continue random walk for indirect light*/
-			/* Generate new direction, evaluate the brdf, importance sampling ecc...*/
-			/* ray = newRay;
-			 * Scale T as seen in the slides; (Russian Roulette lecture) 
-			 */
-		} else {
-			break;
+	Ray newRay;
+	HitRecord hr;
+	if(scene->traverse(ray, EPS, INF, hr, sampler)){
+		auto material = scene->getMaterial(hr.materialIdx);
+		if(material->getType() == Mat::MaterialType::EMISSIVE){
+			return WHITE * 10.0f;
+		} else if(material->getType() == Mat::MaterialType::DIFFUSE){
+			material->reflect(ray, newRay, hr, sampler);
+			auto Ei = trace(newRay) * glm::dot(hr.normal, newRay.direction);
+			auto BRDF = material->albedo / PI;
+			return PI * 2.0f * BRDF * Ei;
 		}
 	}
-	return e;
+	return BLACK;
 }
 
 bool Renderer::init() {
@@ -95,7 +83,13 @@ bool Renderer::init() {
 	glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	CHECK(this->window = glfwCreateWindow(this->opts.width, this->opts.height, ("Orecchiette | " + this->opts.title).c_str(), NULL, NULL)) << "Could not create GLFW3 window\n";
+	if(opts.scaling < 1){
+		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+		CHECK(this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
+	} else {
+		CHECK(this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window";
+	}
 	glfwMakeContextCurrent(this->window);
 	CHECK(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
 	sampler = std::make_shared<XorShift>(time(NULL));
