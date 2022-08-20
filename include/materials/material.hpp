@@ -16,6 +16,7 @@ enum MaterialType {
 class Material {
 	public:
 		Material() {}
+		Material(const Color &c) : albedo(c) {}
 		virtual MaterialType getType() const = 0;
 		virtual bool reflect(const Ray& in, Ray &reflectedRay, const HitRecord &r, std::shared_ptr<Sampler> &sampler) const { return false;} ;
 

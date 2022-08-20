@@ -1,5 +1,9 @@
 #include "emitters/area.hpp"
 
-glm::vec3 Area::sample(std::shared_ptr<Sampler> &sampler) const {
-	return primitive->sample(sampler);
+void Area::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const {
+	primitive->sample(sampler, point, normal);
+}
+
+float Area::area() const {
+	return primitive->area();
 }

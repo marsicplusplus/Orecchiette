@@ -4,6 +4,7 @@ Sphere::Sphere(const Transform &o2w, float radius, int material) :
 	Primitive(o2w, material),
 	radius(radius) {
 	buildBBox();
+	A = ((float)4.0f/(float)3.0f) * PI * radius * radius;
 }
 
 
@@ -36,7 +37,11 @@ bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& 
 	return true;
 }
 
-glm::vec3 Sphere::sample(std::shared_ptr<Sampler> &sampler) const {
+float Sphere::area() const {
+	return A;
+}
+
+void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const {
 	float u = sampler->getSample();
 	float v = sampler->getSample();
 	float theta = u * 2.0f * PI;
@@ -51,6 +56,6 @@ glm::vec3 Sphere::sample(std::shared_ptr<Sampler> &sampler) const {
 	float z = r * cosPhi;
 	glm::vec3 ret{x, y, z};
 
-	ret = (ret + this->obj2world.getTranslation()) * this->radius;
-	return ret;
+	point = (ret + this->obj2world.getTranslation()) * this->radius;
+	normal = (ret);
 }

@@ -25,7 +25,21 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 	return hasHit;
 }
 
-bool Scene::sampleLights(const HitRecord &hr, std::shared_ptr<Sampler> sampler) {
+const std::shared_ptr<Emitter> Scene::sampleLights(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &area) {
+	float f = sampler->getSample();
+	int idx = (f == 1.0 ? lights.size()-1 : f*lights.size());
+	lights[idx]->sample(sampler, point, normal);
+	area = lights[idx]->area();
+	return lights[idx];
+}
+
+bool Scene::isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const {
+	HitRecord hr;
+	for(const auto &p : primitives){
+		if(p->areaEmitter != nullptr && p->areaEmitter != light && 
+				p->hit(ray, EPS, tMax, hr))
+			return true;
+	}
 	return false;
 }
 
@@ -48,7 +62,9 @@ const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 
 void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 	if(materials[p->material]->getType() == Mat::EMISSIVE){
-		lights.push_back(std::make_shared<Area>(p));
+		auto light = std::make_shared<Area>(p, materials[p->material]->albedo, p->area());
+		lights.push_back(light);
+		p->areaEmitter = light;
 	}
 	primitives.push_back(p);
 }

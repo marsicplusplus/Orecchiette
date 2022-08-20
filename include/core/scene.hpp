@@ -35,7 +35,8 @@ class Scene {
 		 * @return true if the ray intersects, false otherwhise.
 		 */
 		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler);
-		bool sampleLights(const HitRecord &hr, std::shared_ptr<Sampler> sampler);
+		const std::shared_ptr<Emitter> sampleLights(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &area);
+		bool isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const;
 
 		const std::shared_ptr<Mat::Material> getMaterial(const uint64_t idx) const;
 

@@ -4,7 +4,7 @@
 namespace Mat {
 	class Emissive : public Material { 
 		public:
-		Emissive();
-		MaterialType getType() const;
+			Emissive(const Color &albedo = WHITE);
+			MaterialType getType() const;
 	};
 };

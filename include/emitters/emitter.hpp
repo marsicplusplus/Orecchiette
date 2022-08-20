@@ -9,27 +9,15 @@
 
 class Emitter {
 	public:
-		//Emitter(const Transform &o2w, const std::shared_ptr<Texture> &emission) : 
-			//o2w(o2w), emission(emission) {}
-		Emitter(const Transform &o2w, Color emission) : 
-			o2w(o2w), color(emission) {}
-		virtual glm::vec3 sample(std::shared_ptr<Sampler> &sampler) const = 0;
-		//virtual sample(const Ray &r);
-		/* TODO: 
-		 * We need:
-		 * 	- method to sample the emitter;
-		 * 	- method to get the pdf of the emitter;
-		 * 	- eval light given a certain direction;
-		 * 	- pdf given a certain direction;
-		 *
-		 * Take care for delta position and delta direction emitters (point light, directional lights);
-		 * Each Emitter takes a texture that represents the Radiance? This way we can use the texture lights Jacco shown us;
-		 * Maybe use indices to texture? This could create A LOT of additional complexity. Just use shared_ptr;
-		 */
+		Emitter(const Transform &o2w, Color emission, float intensity = 1.0f) : 
+			o2w(o2w), color(emission), intensity(intensity) {}
+		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const = 0;
+		virtual float area() const = 0;
 
+		Color color;
+		float intensity;
 	protected:
 		Transform o2w;
-		Color color;
 		//std::shared_ptr<Texture> emission;
 };
 

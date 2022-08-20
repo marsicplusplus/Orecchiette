@@ -1,12 +1,8 @@
 #include "materials/diffuse.hpp"
 
 namespace Mat{
-	Diffuse::Diffuse(const Color &c){
-		albedo = c;
-	}
-	Diffuse::Diffuse() {
-		albedo = Color(0.5f);
-	}
+	Diffuse::Diffuse(const Color &c) : Material(c){}
+	Diffuse::Diffuse() : Material(Color(0.5f)) {}
 
 	MaterialType Diffuse::getType() const {
 		return Mat::MaterialType::DIFFUSE;

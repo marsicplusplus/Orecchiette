@@ -7,11 +7,13 @@ class Sphere : public Primitive {
 	public:
 		Sphere(const Transform &o2w, float radius, int material = 0);
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const override;
-		virtual glm::vec3 sample(std::shared_ptr<Sampler> &sampler) const;
+		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const override;
+		virtual float area() const override;
 
 	private:
 		void buildBBox() override;
 		float radius;
+		float A;
 };
 
 #endif // __SPHERE_HPP__
