@@ -7,6 +7,6 @@ namespace Mat{
 			Diffuse();
 			MaterialType getType() const;
 
-			bool reflect(const Ray& in, Ray &reflectedRay, const HitRecord &r, std::shared_ptr<Sampler> &sampler) const;
+			bool reflect(const Ray& in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &r, std::shared_ptr<Sampler> &sampler) const;
 	};
 }

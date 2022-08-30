@@ -23,13 +23,17 @@ int main(int argv, char* args[]) {
 	Transform t1;
 	scene->addPrimitive(std::make_shared<Sphere>(t1, 1.0));
 	Transform t2;
-	t2.translate(0.0f, -11.0, 0);
-	scene->addPrimitive(std::make_shared<Sphere>(t2, 10.0));
+	t2.translate(0.0f, -2.0, 0);
+	scene->addPrimitive(std::make_shared<Sphere>(t2, 1.0));
 	
 	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE));
 	Transform t3;
-	t3.translate(-3, 0, -1);
-	scene->addPrimitive(std::make_shared<Sphere>(t3, 1.0, 1));
+	t3.translate(-3,-1, 2);
+	//scene->addPrimitive(std::make_shared<Sphere>(t3, 1.0, 1));
+
+	Transform t4;
+	t4.translate(4, 2, 1);
+	scene->addPrimitive(std::make_shared<Sphere>(t4, 1.0, 1));
 
 	std::shared_ptr<Camera::Camera> cam = std::make_unique<Camera::Perspective>(
 				glm::vec3{0.0f, 0.0f, -5.0f},

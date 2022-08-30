@@ -5,6 +5,7 @@
 #include "cameras/perspective.hpp"
 #include <iostream>
 
+
 Renderer::Renderer(const Options &opt) : opts(opt){}
 
 void Renderer::setScene(std::string &fp) {
@@ -59,12 +60,20 @@ void Renderer::start(){
 Color Renderer::trace(const Ray &ray, float lastSpecular){
 	Ray newRay;
 	HitRecord hr;
+#if 0
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 		auto material = scene->getMaterial(hr.materialIdx);
 		if(material->getType() == Mat::MaterialType::EMISSIVE){
 			return lastSpecular * material->albedo;
 		}
-		auto BRDF = material->albedo / PI;
+
+		/* Indirect */
+		glm::vec3 Ei(0.0f), brdf;
+		float pdf = 1.0f;
+		//if(material->getType() == Mat::MaterialType::DIFFUSE){
+			material->reflect(ray, newRay, pdf, brdf, hr, sampler);
+			Ei = (trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction) / (float)pdf);
+		//}
 
 		/* Direct Sampling */
 		glm::vec3 pointOnLight, normalOnLight;
@@ -80,18 +89,27 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 		bool occl = scene->isOccluded(occRay, light, dist);
 		if(NL > 0 && NlL > 0 && !occl){
 			float solidAngle = (NlL * A)/(dist*dist);
-			Ld = light->color * light->intensity * solidAngle * BRDF * NL;
+			Ld = light->color * light->intensity *  solidAngle * NL * brdf;
 		}
 
-		/* Indirect */
-		glm::vec3 Ei(0.0f);
-		//if(material->getType() == Mat::MaterialType::DIFFUSE){
-			material->reflect(ray, newRay, hr, sampler);
-			Ei = trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction);
-		//}
-		return PI * 2.0f * BRDF * Ei + Ld;
+		return PI * 2.0f * brdf * Ei + Ld;
 	}
 	return BLACK;
+#else
+	if(scene->traverse(ray, EPS, INF, hr, sampler)){
+		auto material = scene->getMaterial(hr.materialIdx);
+		if(material->getType() == Mat::MaterialType::EMISSIVE){
+			return WHITE * 10.0f;
+		} else if(material->getType() == Mat::MaterialType::DIFFUSE){
+			glm::vec3 brdf;
+			float pdf;
+			material->reflect(ray, newRay, pdf, brdf, hr, sampler);
+			auto Ei = trace(newRay) * glm::dot(hr.normal, newRay.direction)/pdf;
+			return PI * 2.0f * brdf * Ei;
+		}
+	}
+	return BLACK;
+#endif
 }
 
 bool Renderer::init() {

@@ -1,6 +1,7 @@
 #ifndef __DEFS_HPP__
 #define __DEFS_HPP__
 
+#include "samplers/sampler.hpp"
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
 #include <cmath>
@@ -20,5 +21,6 @@ const Color BLUE			= Color(0.0f, 0.0f, 1.0f);
 
 #define DEG2RAD(_a) ((_a)*(PI)/180.0f)
 #define RAD2DEG(_a) ((_a)*180.0f/ (PI) )
+
 
 #endif // __DEFS_HPP__

@@ -56,6 +56,6 @@ void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::ve
 	float z = r * cosPhi;
 	glm::vec3 ret{x, y, z};
 
-	point = (ret + this->obj2world.getTranslation()) * this->radius;
-	normal = (ret);
+	point = (this->obj2world.getMatrix() * glm::vec4(ret, 1.0f)) * this->radius;
+	normal = (this->obj2world.getMatrix() * glm::vec4(ret, 0.0f));
 }
