@@ -9,6 +9,10 @@ Scene::Scene() {/*TODO empty/default scene?*/
 }
 Scene::Scene(const std::string &fp) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
 
+int Scene::numberOfLights() const {
+	return lights.size();
+}
+
 bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler) {
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
@@ -62,7 +66,7 @@ const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 
 void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 	if(materials[p->material]->getType() == Mat::EMISSIVE){
-		auto light = std::make_shared<Area>(p, materials[p->material]->albedo, p->area());
+		auto light = std::make_shared<Area>(p, materials[p->material]->albedo, 10.0f);
 		lights.push_back(light);
 		p->areaEmitter = light;
 	}

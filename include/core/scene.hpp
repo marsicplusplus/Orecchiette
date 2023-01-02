@@ -47,6 +47,7 @@ class Scene {
 		void addMaterial(const std::shared_ptr<Mat::Material> &m);
 		//void addLight(const std::shared_ptr<Primitive> &p);
 		//void addLight(const std::shared_ptr<Emitter> &e);
+		int numberOfLights() const;
 
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;

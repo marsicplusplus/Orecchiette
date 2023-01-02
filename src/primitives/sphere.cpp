@@ -2,7 +2,10 @@
 
 Sphere::Sphere(const Transform &o2w, float radius, int material) :
 	Primitive(o2w, material),
-	radius(radius) {
+	radius(radius),
+	radiusSq(radius*radius),
+	invRadius(1.0f/radius),
+	center(o2w.getTranslation()){
 	buildBBox();
 	A = ((float)4.0f/(float)3.0f) * PI * radius * radius;
 }
@@ -14,25 +17,29 @@ void Sphere::buildBBox(){
 }
 
 bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const {
-	auto r = ray.transformRay(obj2world.getInverse());
-	auto a = glm::length2(r.direction);
-	auto half_b = dot(r.origin, r.direction);
-	auto c = glm::length2(r.origin) - radius*radius;
-
-	auto discriminant = half_b*half_b - a*c;
-	if (discriminant < 0) return false;
-	auto sqrtd = sqrt(discriminant);
-
-	auto root = (-half_b - sqrtd) / a;
-	if (root < tMin || tMax < root) {
-		root = (-half_b + sqrtd) / a;
-		if (root < tMin || tMax < root)
-			return false;
+	float a = glm::dot(ray.direction, ray.direction);
+	glm::vec3 oc = ray.origin - center;
+	float halfB = glm::dot(ray.direction, oc);
+	float c = glm::dot(oc, oc) - radiusSq;
+	float discriminant = halfB * halfB - a * c;
+	if (discriminant < 0.0f) {
+		return false;
 	}
 
+	float sqrtDiscr = std::sqrt(discriminant);
+	float root = (-halfB - sqrtDiscr) / a;
+	if (root < tMin) {
+		root = (-halfB + sqrtDiscr) / a;
+	}
+
+	if (root < EPS || root >= tMax) {
+		return false;
+	}
+
+	glm::vec3 normal = (ray.at(root) - center) * invRadius;
 	hr.t = root;
-	hr.point = obj2world.getMatrix() * glm::vec4(r.at(hr.t), 1.0f);
-	hr.setFaceNormal(r, obj2world.getTransposeInverse() * glm::vec4((hr.point) / radius, 1.0f));
+	hr.point = ray.at(root);
+	hr.normal = normal;
 	hr.materialIdx = material;
 	return true;
 }

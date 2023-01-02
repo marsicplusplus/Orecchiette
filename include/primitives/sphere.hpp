@@ -13,6 +13,9 @@ class Sphere : public Primitive {
 	private:
 		void buildBBox() override;
 		float radius;
+		float radiusSq;
+		float invRadius;
+		glm::vec3 center;
 		float A;
 };
 

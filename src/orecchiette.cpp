@@ -4,6 +4,7 @@
 #include "primitives/sphere.hpp"
 #include "cameras/perspective.hpp"
 #include "materials/emissive.hpp"
+#include "materials/diffuse.hpp"
 
 int main(int argv, char* args[]) {
 	google::InitGoogleLogging(args[0]);
@@ -23,20 +24,21 @@ int main(int argv, char* args[]) {
 	Transform t1;
 	scene->addPrimitive(std::make_shared<Sphere>(t1, 1.0));
 	Transform t2;
-	t2.translate(0.0f, -2.0, 0);
-	scene->addPrimitive(std::make_shared<Sphere>(t2, 1.0));
-	
+	t2.translate(0.0f, -102.0f, 0);
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(BLUE));
+	scene->addPrimitive(std::make_shared<Sphere>(t2, 100.0, 1));
+
 	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE));
 	Transform t3;
-	t3.translate(-3,-1, 2);
-	//scene->addPrimitive(std::make_shared<Sphere>(t3, 1.0, 1));
+	t3.translate(1,2,1);
+	scene->addPrimitive(std::make_shared<Sphere>(t3, 1.0, 2));
 
-	Transform t4;
-	t4.translate(4, 2, 1);
-	scene->addPrimitive(std::make_shared<Sphere>(t4, 1.0, 1));
+	//Transform t4;
+	//t4.translate(0, -5, 0);
+	//scene->addPrimitive(std::make_shared<Sphere>(t4, 1.0, 2));
 
 	std::shared_ptr<Camera::Camera> cam = std::make_unique<Camera::Perspective>(
-				glm::vec3{0.0f, 0.0f, -5.0f},
+				glm::vec3{0.0f, 1.0f, -5.0f},
 				glm::vec3{0.0, 0.0, -1.0f},
 				glm::vec2{opts.width, opts.height},
 				90.0f

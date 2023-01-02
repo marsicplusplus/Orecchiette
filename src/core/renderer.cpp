@@ -60,7 +60,7 @@ void Renderer::start(){
 Color Renderer::trace(const Ray &ray, float lastSpecular){
 	Ray newRay;
 	HitRecord hr;
-#if 0
+#if 1
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 		auto material = scene->getMaterial(hr.materialIdx);
 		if(material->getType() == Mat::MaterialType::EMISSIVE){
@@ -70,16 +70,16 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 		/* Indirect */
 		glm::vec3 Ei(0.0f), brdf;
 		float pdf = 1.0f;
-		//if(material->getType() == Mat::MaterialType::DIFFUSE){
-			material->reflect(ray, newRay, pdf, brdf, hr, sampler);
-			Ei = (trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction) / (float)pdf);
-		//}
+
+		material->reflect(ray, newRay, pdf, brdf, hr, sampler);
+		Ei = (trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction) / (float)pdf);
 
 		/* Direct Sampling */
 		glm::vec3 pointOnLight, normalOnLight;
 		float A, distance;
 		auto light = scene->sampleLights(sampler, pointOnLight, normalOnLight, A);
 		glm::vec3 dir = glm::normalize(pointOnLight - hr.point);
+		float lightP = 1.0f/(float)scene->numberOfLights();
 
 		float dist = glm::distance(pointOnLight, hr.point);
 		Ray occRay(hr.point + EPS*dir, dir);
@@ -89,7 +89,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 		bool occl = scene->isOccluded(occRay, light, dist);
 		if(NL > 0 && NlL > 0 && !occl){
 			float solidAngle = (NlL * A)/(dist*dist);
-			Ld = light->color * light->intensity *  solidAngle * NL * brdf;
+			Ld = (float) scene->numberOfLights() * light->color * light->intensity *  solidAngle * NL * brdf;
 		}
 
 		return PI * 2.0f * brdf * Ei + Ld;

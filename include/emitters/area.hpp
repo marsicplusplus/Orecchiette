@@ -6,7 +6,7 @@
 
 class Area : public Emitter {
 	public:
-		Area(const std::shared_ptr<Primitive> &area, const Color &c, float intensity = 1.0f)
+		Area(const std::shared_ptr<Primitive> &area, const Color &c, float intensity = 10.0f)
 			: Emitter(Transform(), c, intensity), primitive(area) {}
 
 		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const;
