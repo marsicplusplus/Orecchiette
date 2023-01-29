@@ -34,8 +34,8 @@ set( SRC
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
 	 src/primitives/sphere.cpp
-	 #src/primitives/rect.cpp
-	 #src/primitives/triangle.cpp
+	 src/primitives/xyrect.cpp
+	 src/primitives/triangle.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
 	 src/orecchiette.cpp

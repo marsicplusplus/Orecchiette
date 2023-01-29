@@ -10,7 +10,9 @@
 const float INF 			= std::numeric_limits<float>::max();
 const float EPS 			= 5e-6f;
 const float PI 				= 3.14159265358979323846f;
-const float ONE_OVER_PI 	= 1.0f/3.14159265358979323846f;
+const float ONE_OVER_PI		= 1.0f / 3.14159265358979323846f;
+const float ONE_OVER_2PI	= 1.0f / (2.0f * 3.14159265358979323846f);
+const float ONE_OVER_4PI	= 1.0f / (4.0f * 3.14159265358979323846f);
 typedef glm::vec3 			Color;
 
 const Color BLACK			= Color(0.0f, 0.0f, 0.0f);

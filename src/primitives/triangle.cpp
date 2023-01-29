@@ -2,34 +2,40 @@
 
 #include <algorithm>
 
-Triangle::Triangle(const std::shared_ptr<TriangleMesh> &mesh, unsigned int triangleNumber, int material) : 
-	Primitive(Transform(), material),
-	mesh(mesh), 
-	mat(material) {
-	vIdx = &mesh->vertexIndices[triangleNumber * 3];
-	this->buildBBox();
-}
-
-TriangleMesh::TriangleMesh(const std::string &name, unsigned int nTri, unsigned int nVerts, const unsigned int *vertexIndices, const glm::vec3 *P, const glm::vec3 *N, const glm::vec2 *UV) : 
+TriangleMesh::TriangleMesh(const Transform &o2w, const std::string &name, unsigned int nTri, unsigned int nVerts, const unsigned int *vertexIndices, const glm::vec3 *P, const glm::vec3 *N, const glm::vec2 *UV, int material) : 
 	nTriangles{nTri}, nVertices{nVerts}, name{name},
 	vertexIndices(vertexIndices, vertexIndices + 3 * nTri) {
-		p.reset(new glm::vec3[nVertices]);
+	p.reset(new glm::vec3[nVertices]);
+	for(int i = 0; i < nVertices; ++i){
+		p[i] = P[i];
+	}
+	if(UV){
+		uv.reset(new glm::vec2[nVertices]);
 		for(int i = 0; i < nVertices; ++i){
-			p[i] = P[i];
-		}
-		if(UV){
-			uv.reset(new glm::vec2[nVertices]);
-			for(int i = 0; i < nVertices; ++i){
-				uv[i] = UV[i];
-			}
-		}
-		if(N){
-			n.reset(new glm::vec3[nVertices]);
-			for(int i = 0; i < nVertices; ++i){
-				n[i] = N[i];
-			}
+			uv[i] = UV[i];
 		}
 	}
+	if(N){
+		n.reset(new glm::vec3[nVertices]);
+		for(int i = 0; i < nVertices; ++i){
+			n[i] = N[i];
+		}
+	}
+}
+
+Triangle::Triangle(const std::shared_ptr<TriangleMesh>& mesh, unsigned int triangleNumber, int material) :
+	Primitive(Transform(), material),
+	mesh(mesh) {
+	vIdx = &mesh->vertexIndices[triangleNumber * 3];
+	this->buildBBox();
+	glm::fvec3* v0 = &(this->mesh->p.get())[vIdx[0]];
+	glm::fvec3* v1 = &(this->mesh->p.get())[vIdx[1]];
+	glm::fvec3* v2 = &(this->mesh->p.get())[vIdx[2]];
+	glm::vec3 E1(*v1 - *v0);
+	glm::vec3 E2(*v2 - *v0);
+	auto tmp = glm::cross(E1, E2);
+	A = glm::length(tmp) / 2.0f;
+}
 
 void Triangle::buildBBox() {
 	glm::fvec3 *v0 = &(this->mesh->p.get())[vIdx[0]];
@@ -91,15 +97,14 @@ bool Triangle::hit(const Ray& ray, const float tMin, const float tMax, HitRecord
 		glm::fvec3 hitNormal;
 		hitNormal = u * (*n1) + v * (*n2) + (1.0f - u - v) * (*n0);
 
-		rec.setFaceNormal(ray, hitNormal);
+		rec.setFaceNormal(ray, glm::vec3(0.0, 1.0, 0.0));
 
 		glm::fvec2 uvs[3];
 		//getUV(&uvs[0]);
 
 		glm::fvec2 uv = u * (uvs[1]) + v * (uvs[2]) + (1.0f - u - v) * (uvs[0]);
-		
 		rec.uv = uv;
-		rec.materialIdx = mat;
+		rec.materialIdx = this->material;
 		rec.point = localp;
 		rec.t = tmp;
 
@@ -107,4 +112,34 @@ bool Triangle::hit(const Ray& ray, const float tMin, const float tMax, HitRecord
 	}
 
 	return false;
+}
+
+void Triangle::sample(std::shared_ptr<Sampler>& sampler, glm::vec3& point, glm::vec3& normal) const {
+	glm::fvec3* v0 = &(this->mesh->p.get())[vIdx[0]];
+	glm::fvec3* v1 = &(this->mesh->p.get())[vIdx[1]];
+	glm::fvec3* v2 = &(this->mesh->p.get())[vIdx[2]];
+
+	float p = sampler->getSample();
+	float q = sampler->getSample();
+	if (p + q > 1) {
+		p = 1 - p;
+		q = 1 - q;
+	}
+
+	// A + AB * p + BC * q
+	float x = v0->x + (v1->x - v0->x) * p + (v2->x - v0->x) * q;
+	float y = v0->y + (v1->y - v0->y) * p + (v2->y - v0->y) * q;
+	float z = v0->z + (v1->z - v0->z) * p + (v2->z - v0->z) * q;
+
+	point = glm::vec3{ x, y, z };
+	if (this->mesh->n != nullptr) {
+		glm::fvec3* n0 = &(this->mesh->n.get())[vIdx[0]];
+		glm::fvec3* n1 = &(this->mesh->n.get())[vIdx[1]];
+		glm::fvec3* n2 = &(this->mesh->n.get())[vIdx[2]];
+		normal = -*n0;
+	}
+}
+
+float Triangle::area() const {
+	return A;
 }

@@ -4,11 +4,9 @@ namespace{
 	glm::vec3 randomCosineDirection(std::shared_ptr<Sampler> sampler) {
 		auto r0 = sampler->getSample();
 		auto r1 = sampler->getSample();
-		float term1 = 2.0f * PI * r0;
-		float term2 = sqrt(1.0f-r1);
-		float x = term2 * cosf(term1);
-		float y = term2 * sinf(term1);
-		return glm::vec3(x, y, sqrt(r1));
+		float theta = 2.0f * PI * r1;
+		float r = sqrtf(r0);
+		return glm::vec3(r * cosf(theta), sqrtf(1.0f - r0), r * sinf(theta));
 	}
 
 	void setupTangentSpace( const glm::vec3& N, glm::vec3& T, glm::vec3& B )
@@ -33,6 +31,7 @@ namespace{
 	}
 
 }
+
 namespace Mat{
 	Diffuse::Diffuse(const Color &c) : Material(c){}
 	Diffuse::Diffuse() : Material(Color(0.5f)) {}

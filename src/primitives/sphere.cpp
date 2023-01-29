@@ -7,7 +7,7 @@ Sphere::Sphere(const Transform &o2w, float radius, int material) :
 	invRadius(1.0f/radius),
 	center(o2w.getTranslation()){
 	buildBBox();
-	A = ((float)4.0f/(float)3.0f) * PI * radius * radius;
+	A = 4.0f * PI * radius * radius;
 }
 
 
@@ -58,11 +58,12 @@ void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::ve
 	float cosTheta = cos(theta);
 	float sinPhi = sin(phi);
 	float cosPhi = cos(phi);
-	float x = r * sinPhi * cosTheta;
-	float y = r * sinPhi * sinTheta;
-	float z = r * cosPhi;
+	auto &t = this->obj2world.getTranslation();
+	float x = t.x + this->radius * (r * sinPhi * cosTheta);
+	float y = t.y + this->radius * (r * sinPhi * sinTheta);
+	float z = t.z + this->radius * (r * cosPhi);
 	glm::vec3 ret{x, y, z};
 
 	point = (this->obj2world.getMatrix() * glm::vec4(ret, 1.0f)) * this->radius;
-	normal = (this->obj2world.getMatrix() * glm::vec4(ret, 0.0f));
+	normal = glm::normalize(-(ret - t)/this->radius);
 }

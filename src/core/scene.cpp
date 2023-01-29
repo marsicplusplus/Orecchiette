@@ -5,7 +5,6 @@
 
 Scene::Scene() {/*TODO empty/default scene?*/
 	/* Create default empty material */
-	materials.emplace_back(std::make_shared<Mat::Diffuse>());
 }
 Scene::Scene(const std::string &fp) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
 
@@ -40,9 +39,8 @@ const std::shared_ptr<Emitter> Scene::sampleLights(std::shared_ptr<Sampler> &sam
 bool Scene::isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const {
 	HitRecord hr;
 	for(const auto &p : primitives){
-		if(p->areaEmitter != nullptr && p->areaEmitter != light && 
-				p->hit(ray, EPS, tMax, hr))
-			return true;
+		if (p->areaEmitter != nullptr && p->areaEmitter == light) continue;
+		else if (p->hit(ray, EPS, tMax, hr)) return true;
 	}
 	return false;
 }
@@ -66,7 +64,7 @@ const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 
 void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 	if(materials[p->material]->getType() == Mat::EMISSIVE){
-		auto light = std::make_shared<Area>(p, materials[p->material]->albedo, 10.0f);
+		auto light = std::make_shared<Area>(p, materials[p->material]->albedo, 5.0f);
 		lights.push_back(light);
 		p->areaEmitter = light;
 	}

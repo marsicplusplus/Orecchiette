@@ -67,10 +67,10 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 			return lastSpecular * material->albedo;
 		}
 
-		/* Indirect */
 		glm::vec3 Ei(0.0f), brdf;
 		float pdf = 1.0f;
 
+		/* Indirect */
 		material->reflect(ray, newRay, pdf, brdf, hr, sampler);
 		Ei = (trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction) / (float)pdf);
 
@@ -91,7 +91,6 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 			float solidAngle = (NlL * A)/(dist*dist);
 			Ld = (float) scene->numberOfLights() * light->color * light->intensity *  solidAngle * NL * brdf;
 		}
-
 		return PI * 2.0f * brdf * Ei + Ld;
 	}
 	return BLACK;
@@ -99,7 +98,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 		auto material = scene->getMaterial(hr.materialIdx);
 		if(material->getType() == Mat::MaterialType::EMISSIVE){
-			return WHITE * 10.0f;
+			return material->albedo * 10.0f;
 		} else if(material->getType() == Mat::MaterialType::DIFFUSE){
 			glm::vec3 brdf;
 			float pdf;
