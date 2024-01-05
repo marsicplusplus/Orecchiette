@@ -32,7 +32,10 @@ class Renderer{
 		std::shared_ptr<Sampler> sampler;
 		std::shared_ptr<Scene> scene;
 		bool isInitialized;
-		uint64_t nFrames;
+		bool isBufferInvalid;
+
+		float lastUpdateTime = 0.0;
+		uint64_t nFrames = 0;
 };
 
 #endif //__RENDERER_HPP__

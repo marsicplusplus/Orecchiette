@@ -31,6 +31,7 @@ set( SRC
 	 src/core/transform.cpp
 	 src/core/options.cpp
 	 src/core/scene.cpp
+	 src/core/thread_pool.cpp
 	 src/emitters/area.cpp
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp

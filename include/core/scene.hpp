@@ -49,6 +49,8 @@ class Scene {
 		//void addLight(const std::shared_ptr<Emitter> &e);
 		int numberOfLights() const;
 
+		bool update(float dt);
+
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
 		std::vector<std::shared_ptr<Emitter>> lights;

@@ -31,7 +31,7 @@ int main(int argv, char* args[]) {
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));
 
 	Transform t1;
-	t1.translate(-0.6f, -1.5f, -2.0f);
+	t1.translate(-2.6f, -1.5f, -2.0f);
 	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.5, 0));
 	t1.translate(2.3f, 0.4, 0.0f);
 	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.8, 3));
@@ -95,10 +95,11 @@ int main(int argv, char* args[]) {
 	}
 
 	std::shared_ptr<Camera::Camera> cam = std::make_unique<Camera::Perspective>(
-				glm::vec3{0.0f, 0.0f, -7.0f},
-				glm::vec3{0.0, 0.0, -1.0f},
-				glm::vec2{opts.width, opts.height},
-				90.0f
+				glm::vec3{1.0f, 0.1f, 5.0f}, 			// Origin
+				glm::vec3{0.0, 0.0, -1.0f},				// LookAt
+				glm::vec3{0.0, 1.0, 0.0f},				// Up
+				glm::vec2{opts.width, opts.height},		// Screenbounds
+				90.0f									// Fov
 			);
 	scene->setCamera(cam);
 	

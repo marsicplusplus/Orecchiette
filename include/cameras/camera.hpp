@@ -10,7 +10,7 @@ namespace Camera {
 class Camera {
 	public:
 		virtual void getCameraRay(float x, float y, Ray *ray, std::shared_ptr<Sampler> sampler) const = 0;
-		virtual void update(float deltaP) = 0;
+		virtual bool update(float deltaP) = 0;
 	private:
 };
 }

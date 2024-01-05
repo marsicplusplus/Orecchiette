@@ -1,5 +1,6 @@
 #include "glad/glad.h"
 #include "core/renderer.hpp"
+#include "core/thread_pool.hpp"
 
 #include "plog/Log.h"
 #include "samplers/xorshift.hpp"
@@ -39,33 +40,62 @@ void Renderer::start(){
 		if(inpManager->isKeyDown(GLFW_KEY_ESCAPE)){
 			glfwSetWindowShouldClose(this->window, true);
 		}
-		this->nFrames++;
-			for(int tileRow = 0; tileRow < verticalTiles; ++tileRow){
-				for(int tileCol = 0; tileCol < horizontalTiles; ++tileCol){
-					for (int row = 0; row < tHeight; ++row) {
-						for (int col = 0; col < tWidth; ++col) {
+		this->lastUpdateTime = glfwGetTime();
+		float frameTime = 0.0f;
+		float lastTime = 0.0f;
+		if (this->isBufferInvalid) {
+			this->isBufferInvalid = false;
+			this->nFrames = 0.0;
+		}
+		else {
+			this->nFrames++;
+		}
+		std::vector<std::future<void>> futures;
+		for (int tileRow = 0; tileRow < verticalTiles; ++tileRow) {
+			for (int tileCol = 0; tileCol < horizontalTiles; ++tileCol) {
+				futures.push_back(Threading::pool.queue([&, tileRow, tileCol, spp](std::shared_ptr<Sampler> sampler) {
+					for (int row = 0; row < tHeight; ++row)
+					{
+						for (int col = 0; col < tWidth; ++col)
+						{
 							int x = col + tWidth * tileCol;
 							int y = row + tHeight * tileRow;
 							int idx = wWidth * y + x;
 							Color c = BLACK;
-							for (int i = 0; i < spp; ++i) {
+							for (int i = 0; i < spp; ++i)
+							{
 								Ray ray;
-								if (scene) {
+								if (scene)
+								{
 									scene->getCamera()->getCameraRay(x, y, &ray, sampler);
 									c += trace(ray);
 								}
-								else {
+								else
+								{
 									auto t = 0.5f * (row + 1.0f);
 									c += (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7, 1.0);
 								}
 							}
-							framebuffer.putPixel(idx, c/(float)spp, nFrames);
+							framebuffer.putPixel(idx, c / (float)spp, nFrames);
 						}
 					}
-				}
+				}));
 			}
-			framebuffer.present();
-			glfwSwapBuffers(this->window);
+		}
+		for(auto& f : futures){
+			f.get();
+		}
+		float now = glfwGetTime();
+		frameTime = now - lastUpdateTime;
+		lastTime = frameTime;
+		lastUpdateTime = now;
+		while(frameTime > 0.0) {
+			float dt = std::min(frameTime, 1.0f/60.0f);
+			frameTime -= dt;
+			if(scene) this->isBufferInvalid = this->scene->update(dt);
+		}	
+		framebuffer.present();
+		glfwSwapBuffers(this->window);
 	}
 }
 
@@ -150,6 +180,7 @@ bool Renderer::init() {
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;
 	nFrames = 0;
+	Threading::pool.init(8);
 	return isInitialized;
 }
 

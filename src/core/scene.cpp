@@ -12,6 +12,14 @@ int Scene::numberOfLights() const {
 	return lights.size();
 }
 
+bool Scene::update(float dt) {
+	bool ret = false;
+	if(this->camera != nullptr) {
+		ret = this->camera->update(dt);
+	}
+	return ret;
+}
+
 bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler) {
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
