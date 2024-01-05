@@ -6,7 +6,7 @@
 
 class InputManager {
 protected:
-	InputManager() {}
+	InputManager() : isEnabled(true) {}
 	static InputManager* inputManager;
 
 public:

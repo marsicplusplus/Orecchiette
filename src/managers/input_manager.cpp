@@ -7,9 +7,9 @@ void InputManager::setIsKeyDown(int key, bool isDown) {
         inputManager = new InputManager;
     }
     auto iterator = keys.find(key);
-    if (iterator != keys.end()) {
+    // if (iterator != keys.end()) {
         keys[key] = isDown;
-    }
+    // }
 }
 
 bool InputManager::isKeyDown(int key) {

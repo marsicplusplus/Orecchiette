@@ -8,7 +8,7 @@
 #include "materials/diffuse.hpp"
 
 int main(int argv, char* args[]) {
-	plog::init(plog::fatal, "log.csv", 100000, 5);
+	plog::init(plog::debug, "log.csv", 100000, 5);
 
 	std::string configPath = "";
 	for(int i = 1; i < argv; i++){
