@@ -1,12 +1,18 @@
 #include "glad/glad.h"
 #include "core/renderer.hpp"
-#include "glog/logging.h"
+
+#include "plog/Log.h"
+
 #include "samplers/xorshift.hpp"
 #include "cameras/perspective.hpp"
-#include <iostream>
+#include "managers/input_manager.hpp"
 
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	auto inputManager = InputManager::GetInstance();
+	inputManager->setIsKeyDown(key, action != GLFW_RELEASE);
+}
 
-Renderer::Renderer(const Options &opt) : opts(opt){}
+Renderer::Renderer(const Options &opt) : opts(opt), isInitialized(false), nFrames(0) {}
 
 void Renderer::setScene(std::string &fp) {
 
@@ -21,15 +27,19 @@ void Renderer::drawGUI(){
 }
 
 void Renderer::start(){
-	const int tHeight 	= this->opts.tileH;
-	const int tWidth 	= this->opts.tileW;
-	const int wWidth	= this->opts.width;
-	const int wHeight	= this->opts.height;
-	const int horizontalTiles =  wWidth / tWidth;
-	const int verticalTiles = wHeight / tHeight;
-
+	const int tHeight 			= this->opts.tileH;
+	const int tWidth 			= this->opts.tileW;
+	const int wWidth			= this->opts.width;
+	const int wHeight			= this->opts.height;
+	const int horizontalTiles	=  wWidth / tWidth;
+	const int verticalTiles		= wHeight / tHeight;
+	const int spp				= this->opts.spp;
 	while(!glfwWindowShouldClose(this->window)){
 		glfwPollEvents();
+		auto inpManager = InputManager::GetInstance();
+		if(inpManager->isKeyDown(GLFW_KEY_ESCAPE)){
+			glfwSetWindowShouldClose(this->window, true);
+		}
 		this->nFrames++;
 			for(int tileRow = 0; tileRow < verticalTiles; ++tileRow){
 				for(int tileCol = 0; tileCol < horizontalTiles; ++tileCol){
@@ -38,16 +48,19 @@ void Renderer::start(){
 							int x = col + tWidth * tileCol;
 							int y = row + tHeight * tileRow;
 							int idx = wWidth * y + x;
-							Ray ray;
-							Color color;
-							if(scene){
-								scene->getCamera()->getCameraRay(x, y, &ray, sampler);
-								color = trace(ray);
-							} else {
-								auto t = 0.5f*(row + 1.0f);
-								color = (1.0f-t)*glm::vec3(1.0, 1.0, 1.0) + t*glm::vec3(0.5, 0.7, 1.0);
+							Color c = BLACK;
+							for (int i = 0; i < spp; ++i) {
+								Ray ray;
+								if (scene) {
+									scene->getCamera()->getCameraRay(x, y, &ray, sampler);
+									c += trace(ray);
+								}
+								else {
+									auto t = 0.5f * (row + 1.0f);
+									c += (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7, 1.0);
+								}
 							}
-							framebuffer.putPixel(idx, color, nFrames);
+							framebuffer.putPixel(idx, c/(float)spp, nFrames);
 						}
 					}
 				}
@@ -112,7 +125,8 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 }
 
 bool Renderer::init() {
-	CHECK(glfwInit()) << "Cannot Initialize GLFW";
+	glfwInit();
+	// CHECK(glfwInit()) << "Cannot Initialize GLFW";
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -124,12 +138,16 @@ bool Renderer::init() {
 	if(opts.scaling < 1){
 		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-		CHECK(this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
+		this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL);
+		// CHECK(this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
 	} else {
-		CHECK(this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window";
+		this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL);
+		// CHECK(this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window";
 	}
 	glfwMakeContextCurrent(this->window);
-	CHECK(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
+	glfwSetKeyCallback(this->window, keyCallback);
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+	// CHECK(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
 	sampler = std::make_shared<XorShift>(time(NULL));
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;

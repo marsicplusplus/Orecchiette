@@ -1,4 +1,4 @@
-#include "glog/logging.h"
+// #include "glog/logging.h"
 #include "core/renderer.hpp"
 
 #include "primitives/sphere.hpp"
@@ -8,8 +8,8 @@
 #include "materials/diffuse.hpp"
 
 int main(int argv, char* args[]) {
-	google::InitGoogleLogging(args[0]);
-	FLAGS_logtostderr = 1;
+	// FLAGS_log_dir = "C:\\Users\\loren\\OneDrive\\Desktop\\";
+	// google::InitGoogleLogging(args[0]);
 
 	std::string configPath = "";
 	for(int i = 1; i < argv; i++){
@@ -26,12 +26,13 @@ int main(int argv, char* args[]) {
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(RED));
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.7, 0.5, 0.7)));
 	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE));
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));
 
 	Transform t1;
 	t1.translate(-0.6f, -1.5f, -2.0f);
 	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.5, 0));
 	t1.translate(2.3f, 0.4, 0.0f);
-	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.8, 0));
+	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.8, 3));
 	//scene->addPrimitive(std::make_shared<Sphere>(t2, 100.0, 1));
 
 	// Light
@@ -60,25 +61,33 @@ int main(int argv, char* args[]) {
 		planeIdxs,
 		p,
 		n,
-		nullptr,
-		1);
+		nullptr);
 	for (int i = 0; i < 2; ++i) {
 		scene->addPrimitive(std::make_shared<Triangle>(trimesh, i, 1));
 	}
 
 	glm::vec3 p1[] = {
-	glm::vec3(-2.5, 4, -2.5),
-	glm::vec3(-2.5, 4, 2.5),
-	glm::vec3(2.5, 4, 2.5),
-	glm::vec3(2.5, 4, -2.5),
+	glm::vec3(-2.5, 0, -2.5),
+	glm::vec3(-2.5, 0, 2.5),
+	glm::vec3(2.5,0, 2.5),
+	glm::vec3(2.5, 0, -2.5),
 	};
-	auto trimeshlight = std::make_shared<TriangleMesh>(t2,
+	glm::vec3 negN[] = {
+		glm::vec3(0.0f, -1.0f, 0.0f),
+		glm::vec3(0.0f, -1.0f, 0.0f),
+		glm::vec3(0.0f, -1.0f, 0.0f),
+		glm::vec3(0.0f, -1.0f, 0.0f),
+	};
+	Transform lightTransform;
+	//lightTransform.rotate(glm::radians(-45.0), glm::fvec3(0.0, 0.0, 1.0));
+	lightTransform.translate(glm::fvec3(3, 2, -1));
+	//lightTransform.scale(2);
+	auto trimeshlight = std::make_shared<TriangleMesh>(lightTransform,
 		"PlaneLight", 2, 4,
 		planeIdxs,
 		p1,
-		n,
-		nullptr,
-		1);
+		negN,
+		nullptr);
 	for (int i = 0; i < 2; ++i) {
 		scene->addPrimitive(std::make_shared<Triangle>(trimeshlight, i, 2));
 	}

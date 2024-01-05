@@ -8,7 +8,7 @@ set( GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW lib only" FORCE)
 set( GLFW_INSTALL OFF CACHE BOOL "GLFW lib only" FORCE)
 
 add_subdirectory( external/glfw )
-add_subdirectory( external/glog )
+# add_subdirectory( external/glog )
 
 include_directories( 
 	external/glfw/include 
@@ -39,12 +39,13 @@ set( SRC
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
 	 src/orecchiette.cpp
+	 src/managers/input_manager.cpp
 	)
 
-add_executable( Orecchiette WIN32 ${SRC} )
+add_executable( Orecchiette WIN32 ${SRC})
 target_link_libraries( Orecchiette 
 						glfw 
-						glog::glog
+						# glog::glog
 					)
 target_compile_options( Orecchiette PRIVATE )
 set_property(TARGET Orecchiette PROPERTY CXX_STANDARD 17)

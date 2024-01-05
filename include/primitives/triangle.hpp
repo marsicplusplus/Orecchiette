@@ -7,7 +7,7 @@
 
 class TriangleMesh {
 	public:
-		TriangleMesh(const Transform &o2w, const std::string& name, unsigned int nTri, unsigned int nVerts, const unsigned int *vertexIndices, const glm::vec3 *p, const glm::vec3 *n, const glm::vec2 *uv, int material);
+		TriangleMesh(const Transform &o2w, const std::string& name, unsigned int nTri, unsigned int nVerts, const unsigned int *vertexIndices, const glm::vec3 *p, const glm::vec3 *n, const glm::vec2 *uv);
 
 	public:
 		const unsigned int nTriangles, nVertices;
@@ -16,6 +16,10 @@ class TriangleMesh {
 		std::unique_ptr<glm::vec3[]> n;
 		std::unique_ptr<glm::vec2[]> uv;
 		const std::string name;
+		const Transform& getTransform() { return o2w; }
+
+	private:
+		Transform o2w;
 };
 
 class Triangle : public Primitive {

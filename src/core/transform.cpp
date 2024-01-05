@@ -29,7 +29,7 @@ void Transform::rotate(float angle, const glm::vec3 &rotAxis) {
 	updateMatrix();
 }
 
-void Transform::translate(glm::vec3 &tran) {
+void Transform::translate(const glm::vec3 &tran) {
 	translate(tran.x, tran.y, tran.z);
 }
 

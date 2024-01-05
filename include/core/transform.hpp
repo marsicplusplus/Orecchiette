@@ -21,7 +21,7 @@ class Transform {
 		void rotate(float angle, const glm::vec3 &rotAxis);
 
 		void translate(float x, float y, float z);
-		void translate(glm::vec3 &tran);
+		void translate(const glm::vec3 &tran);
 
 		inline const glm::vec3& getTranslation() const { return t; }
 		inline const glm::vec3& getScale() const { return s; }

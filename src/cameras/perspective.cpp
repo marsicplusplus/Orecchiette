@@ -24,11 +24,15 @@ void Perspective::getCameraRay(float x, float y, Ray *ray, std::shared_ptr<Sampl
 	float jitterX = sampler->getSample();
 	float jitterY = sampler->getSample();
 	glm::vec2 uv = {
-		float(x) / (float)(this->screenBounds.x-1),
-		float(y) / (float)(this->screenBounds.y-1),
+		float(x + jitterX) / (float)(this->screenBounds.x-1),
+		float(y + jitterY) / (float)(this->screenBounds.y-1),
 	};
 	
 	ray->direction = this->llCorner + uv.x * this->horizontal + uv.y * this->vertical - this->origin;
 	ray->origin = this->origin;
+}
+
+void Perspective::update(float deltap) {
+
 }
 };
