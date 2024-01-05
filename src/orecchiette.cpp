@@ -1,6 +1,6 @@
-// #include "glog/logging.h"
 #include "core/renderer.hpp"
-
+#include "plog/Log.h"
+#include "plog/Initializers/RollingFileInitializer.h"
 #include "primitives/sphere.hpp"
 #include "primitives/triangle.hpp"
 #include "cameras/perspective.hpp"
@@ -8,8 +8,7 @@
 #include "materials/diffuse.hpp"
 
 int main(int argv, char* args[]) {
-	// FLAGS_log_dir = "C:\\Users\\loren\\OneDrive\\Desktop\\";
-	// google::InitGoogleLogging(args[0]);
+	plog::init(plog::fatal, "log.csv", 100000, 5);
 
 	std::string configPath = "";
 	for(int i = 1; i < argv; i++){
@@ -17,11 +16,14 @@ int main(int argv, char* args[]) {
 			configPath = (&args[i][strlen("config=")]);
 		}
 	}
+
 	Options opts;
 	if(!configPath.empty()){
 		opts.parseFromFile(configPath);
 	}
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
+
+	PLOG_INFO << "Orecchiette; Config file: " << configPath;
 
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(RED));
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.7, 0.5, 0.7)));

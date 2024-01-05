@@ -2,7 +2,6 @@
 #include "core/renderer.hpp"
 
 #include "plog/Log.h"
-
 #include "samplers/xorshift.hpp"
 #include "cameras/perspective.hpp"
 #include "managers/input_manager.hpp"
@@ -126,7 +125,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 
 bool Renderer::init() {
 	glfwInit();
-	// CHECK(glfwInit()) << "Cannot Initialize GLFW";
+	PLOG_FATAL_IF(!glfwInit()) << "Cannot Initialize GLFW";
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -139,15 +138,14 @@ bool Renderer::init() {
 		GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 		this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL);
-		// CHECK(this->window = glfwCreateWindow(mode->width, mode->height, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
 	} else {
 		this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL);
-		// CHECK(this->window = glfwCreateWindow((opts.width)*opts.scaling, opts.height*opts.scaling, opts.title.c_str(), NULL, NULL)) << "ERROR::Renderer::initSystems > could not create GLFW3 window";
 	}
+	PLOG_FATAL_IF(this->window == nullptr) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
 	glfwMakeContextCurrent(this->window);
 	glfwSetKeyCallback(this->window, keyCallback);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	// CHECK(gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
+	PLOG_FATAL_IF(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
 	sampler = std::make_shared<XorShift>(time(NULL));
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;
