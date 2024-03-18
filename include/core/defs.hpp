@@ -24,5 +24,9 @@ const Color BLUE			= Color(0.0f, 0.0f, 1.0f);
 #define DEG2RAD(_a) ((_a)*(PI)/180.0f)
 #define RAD2DEG(_a) ((_a)*180.0f/ (PI) )
 
+struct BoundingBox {
+	glm::vec3 min = {INF, INF, INF};
+	glm::vec3 max = {-INF, -INF, -INF};
+};
 
 #endif // __DEFS_HPP__

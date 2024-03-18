@@ -1,5 +1,4 @@
 #include "materials/material.hpp"
-#include "primitives/primitive.hpp"
 
 namespace Mat {
 	class Emissive : public Material { 

@@ -7,6 +7,8 @@
 #include "cameras/perspective.hpp"
 #include "managers/input_manager.hpp"
 
+#define MAX_DEPTH 5
+
 void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	auto inputManager = InputManager::GetInstance();
 	inputManager->setIsKeyDown(key, action != GLFW_RELEASE);
@@ -98,11 +100,62 @@ void Renderer::start(){
 		glfwSwapBuffers(this->window);
 	}
 }
-
-Color Renderer::trace(const Ray &ray, float lastSpecular){
+#if 1
+Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 	Ray newRay;
 	HitRecord hr;
-#if 1
+
+	if (depth > MAX_DEPTH) {
+		return BLACK;
+	}
+
+	if(scene->traverse(ray, EPS, INF, hr, sampler)){
+#if 0
+		glm::vec3 Ei = BLACK;
+		for (int i = 0; i < scene->numberOfLights(); ++i){
+			glm::vec3 pointOnLight, lightNormal;
+			float lightArea;
+			auto emitter = scene->sampleLight(sampler, i, pointOnLight, lightNormal, lightArea);
+			glm::vec3 L = pointOnLight - hr.point;
+			float dist = L.length();
+			L /= dist;
+			float cosO = glm::dot(-L, lightNormal);
+			float cosI = glm::dot(L, hr.normal);
+			if((cosO <= 0) || (cosI <= 0)) return BLACK;
+			Ray r = Ray(hr.point + EPS * L, L);
+			HitRecord hrDirect;
+			if(!scene->traverse(r, EPS, INF, hrDirect, sampler)) return BLACK;
+			auto material = scene->getMaterial(hr.materialIdx);
+			glm::vec3 brdf = material->brdf(ray.direction, r.direction);
+			float solidAngle = (cosO * emitter->area()) / (dist * dist);
+			Ei += brdf * emitter->color * solidAngle * cosI;
+		}
+		return Ei * ((float)scene->numberOfLights());
+#else
+		auto material = scene->getMaterial(hr.materialIdx);
+		float pdf;
+		glm::vec3 brdf;
+		if(material->reflect(ray, newRay, pdf, brdf, hr, sampler)) {
+			glm::vec3 Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
+			return brdf * Ei;
+		} else {
+			return material->albedo;
+		}
+#endif
+	} else {
+		// No hit
+		// sky
+        // auto unitDir = ray.direction;
+        // float t = 0.5f*(unitDir.y + 1.0f);
+        // return ((1.0f-t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f)) * 0.3f;
+		return BLACK;
+	}
+}
+#else
+Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth){
+	Ray newRay;
+	HitRecord hr;
+#if 0
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 		auto material = scene->getMaterial(hr.materialIdx);
 		if(material->getType() == Mat::MaterialType::EMISSIVE){
@@ -140,7 +193,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 		auto material = scene->getMaterial(hr.materialIdx);
 		if(material->getType() == Mat::MaterialType::EMISSIVE){
-			return material->albedo * 10.0f;
+			return material->albedo * 1.0f;
 		} else if(material->getType() == Mat::MaterialType::DIFFUSE){
 			glm::vec3 brdf;
 			float pdf;
@@ -152,6 +205,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular){
 	return BLACK;
 #endif
 }
+#endif
 
 bool Renderer::init() {
 	glfwInit();

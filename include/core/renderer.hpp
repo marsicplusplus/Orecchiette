@@ -24,7 +24,7 @@ class Renderer{
 
 	private:
 		void drawGUI();
-		Color trace(const Ray &ray, float lastSpecular = 1);
+		Color trace(const Ray &ray, float lastSpecular = 1, uint32_t depth = 0);
 
 		GLFWwindow *window;
 		Framebuffer framebuffer;

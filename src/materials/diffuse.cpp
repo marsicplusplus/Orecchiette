@@ -1,70 +1,55 @@
 #include "materials/diffuse.hpp"
-#include <iostream>
+#include "core/OrthonormalBasis.hpp"
+#include "glm/mat4x4.hpp"
+#include "glm/gtx/transform.hpp"
+#include "glm/gtx/rotate_vector.hpp"
+
+#define UNIFORM_SAMPLING
 namespace{
-	glm::vec3 randomCosineDirection(std::shared_ptr<Sampler> sampler) {
-		auto r0 = sampler->getSample();
-		auto r1 = sampler->getSample();
-		float theta = 2.0f * PI * r1;
-		float r = sqrtf(r0);
-		return glm::vec3(r * cosf(theta), sqrtf(1.0f - r0), r * sinf(theta));
-	}
-
-	void setupTangentSpace( const glm::vec3& N, glm::vec3& T, glm::vec3& B )
+	glm::vec3 cosineSampling(const float &r1, const float &r2)
 	{
-		// "Building an Orthonormal Basis, Revisited"
-		float sign = copysignf( 1.0f, N.z );
-		const float a = -1.0f / (sign + N.z);
-		const float b = N.x * N.y * a;
-		B = glm::vec3( 1.0f + sign * N.x * N.x * a, sign * b, -sign * N.x );
-		T = glm::vec3( b, sign + N.y * N.y * a, -N.y );
+		float phi = 2.0f * M_PI * r1;
+
+		float x = cos(phi) * sqrt(r2);
+		float y = sin(phi) * sqrt(r2);
+		float z = sqrt(1.0 - r2);
+
+		return glm::vec3(x, y, z);
 	}
 
-	glm::vec3 tangent2World( const glm::vec3& V, const glm::vec3& N )
+	glm::vec3 diffuseReflection(const HitRecord hr, std::shared_ptr<Sampler> &sampler)
 	{
-		glm::vec3 T, B;
-		setupTangentSpace( N, T, B );
-		return V.x * T + V.y * B + V.z * N;
+		auto sample = cosineSampling(sampler->getSample(), sampler->getSample());
+		OrthonormalBasis onb;
+		onb.buildFromNormal(hr.normal);
+		return onb.local(sample);
 	}
-
-	glm::vec3 tangent2World( const glm::vec3& V, const glm::vec3& N, const glm::vec3& T, const glm::vec3& B ){
-		return V.x * T + V.y * B + V.z * N;
-	}
-
 }
 
-namespace Mat{
-	Diffuse::Diffuse(const Color &c) : Material(c){}
+namespace Mat
+{
+	Diffuse::Diffuse(const Color &c) : Material(c) {}
 	Diffuse::Diffuse() : Material(Color(0.5f)) {}
 
-	MaterialType Diffuse::getType() const {
+	MaterialType Diffuse::getType() const
+	{
 		return Mat::MaterialType::DIFFUSE;
 	}
 
-	bool Diffuse::reflect(const Ray& in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr,  std::shared_ptr<Sampler> &sampler) const { 
-#if 1
-		auto r0 = sampler->getSample();
-		auto r1 = sampler->getSample();
-		const float term1 = 2.0f * PI * r0, term2 = sqrtf( 1.0f - r1 * r1 );
-		float s = cosf(term1), c = sinf(term1);
-		glm::vec3 dir( c * term2, s * term2, r1 );
-		dir = glm::normalize(tangent2World(dir, hr.normal));
-		
-		if(glm::dot(hr.normal, dir) < 0) dir = -dir;
-		reflectedRay.origin = hr.point + EPS*dir;
-		reflectedRay.direction = dir;
-		pdf = 1.0f;
-#else
-		auto direction = randomCosineDirection(sampler);
-		//direction = glm::normalize(direction);
-		direction = glm::normalize(tangent2World(direction, hr.normal));
-		reflectedRay.origin = hr.point + EPS*direction;
-		reflectedRay.direction = direction;
-		//std::cout << direction.x << " | " << direction.y << " | " << direction.z << "\n";
-
-		pdf = std::max(0.0f, glm::dot(hr.normal, direction)) * ONE_OVER_PI;
-		if (dot( hr.normal, direction ) <= 0) pdf = 0;
-#endif
+	bool Diffuse::reflect(const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr, std::shared_ptr<Sampler> &sampler) const
+	{
 		brdf = this->albedo / PI;
+		auto dir = glm::normalize(diffuseReflection(hr, sampler));
+		if (glm::dot(hr.normal, dir) < 0)
+			dir = -dir;
+		reflectedRay.origin = hr.point + EPS * dir;
+		reflectedRay.direction = dir;
+		pdf = glm::dot(hr.normal, dir) / M_PI;
 		return true;
+	}
+
+	glm::vec3 Diffuse::brdf(glm::vec3 wo, glm::vec3 wi)
+	{
+		return this->albedo / PI;
 	}
 }

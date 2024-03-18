@@ -1,7 +1,8 @@
 #ifndef __SCENE_HPP__
 #define __SCENE_HPP__
 
-#include "primitives/primitive.hpp"
+#include "shapes/shape.hpp"
+#include "core/primitive.hpp"
 #include "emitters/emitter.hpp"
 #include "cameras/camera.hpp"
 #include "core/defs.hpp"
@@ -35,6 +36,7 @@ class Scene {
 		 * @return true if the ray intersects, false otherwhise.
 		 */
 		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler);
+		const std::shared_ptr<Emitter> sampleLight(std::shared_ptr<Sampler> &sampler, uint32_t idx, glm::vec3 &point, glm::vec3 &normal, float &area);
 		const std::shared_ptr<Emitter> sampleLights(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &area);
 		bool isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const;
 

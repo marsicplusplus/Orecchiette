@@ -27,17 +27,19 @@ set( SRC
 	 external/glad/src/glad.c
 	 src/core/renderer.cpp
 	 src/core/framebuffer.cpp
+	 src/core/OrthonormalBasis.cpp
 	 src/core/ray.cpp
 	 src/core/transform.cpp
 	 src/core/options.cpp
 	 src/core/scene.cpp
 	 src/core/thread_pool.cpp
+	 src/core/primitive.cpp
 	 src/emitters/area.cpp
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
-	 src/primitives/sphere.cpp
-	 src/primitives/xyrect.cpp
-	 src/primitives/triangle.cpp
+	 src/shapes/sphere.cpp
+	 src/shapes/xyrect.cpp
+	 src/shapes/triangle.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
 	 src/orecchiette.cpp

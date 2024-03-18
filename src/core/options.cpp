@@ -3,8 +3,8 @@
 #include <fstream>
 
 Options::Options() {
-	width 		= 512;
-	height 		= 512;
+	width 		= 768;
+	height 		= 432;
 	tileH 		= 8;
 	tileW 		= 8;
 	title 		= "Orecchiette";

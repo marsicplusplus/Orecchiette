@@ -1,8 +1,8 @@
 #include "core/renderer.hpp"
 #include "plog/Log.h"
 #include "plog/Initializers/RollingFileInitializer.h"
-#include "primitives/sphere.hpp"
-#include "primitives/triangle.hpp"
+#include "shapes/sphere.hpp"
+#include "shapes/triangle.hpp"
 #include "cameras/perspective.hpp"
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
@@ -25,31 +25,44 @@ int main(int argv, char* args[]) {
 
 	PLOG_INFO << "Orecchiette; Config file: " << configPath;
 
-	scene->addMaterial(std::make_shared<Mat::Diffuse>(RED));
-	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.7, 0.5, 0.7)));
-	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE));
-	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(RED));						// 0
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(2.7, 2.5, 2.7)));	// 1
+	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 5.0f));						// 2
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
 
+	// Spheres
 	Transform t1;
-	t1.translate(-2.6f, -1.5f, -2.0f);
-	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.5, 0));
-	t1.translate(2.3f, 0.4, 0.0f);
-	scene->addPrimitive(std::make_shared<Sphere>(t1, 0.8, 3));
-	//scene->addPrimitive(std::make_shared<Sphere>(t2, 100.0, 1));
+	t1.translate(-1.5f, 1.0f, -3.0f);
+	std::shared_ptr sphereShape1 = std::make_shared<Sphere>(t1, 1.0);
+	std::shared_ptr<Primitive> sphere1 = std::make_shared<Primitive>(sphereShape1, 0);
+	scene->addPrimitive(sphere1);
+	Transform transf;
+	transf.translate(glm::vec3(1.4f, 0.8f, -1.4));
+	scene->addPrimitive(
+		std::make_shared<Primitive>(std::make_shared<Sphere>(transf, 0.8), 
+		3)
+	);
+	// Lights
+	Transform lightTransform;
+	lightTransform.translate(glm::fvec3(-1, 2.4, -3));
+	scene->addPrimitive(std::make_shared<Primitive>(
+		std::make_shared<Sphere>(lightTransform, 0.4), 
+		2)
+	);
+	Transform lightTransform1;
+	lightTransform1.translate(glm::fvec3(0.5, 2.0, -2));
+	scene->addPrimitive(std::make_shared<Primitive>(
+		std::make_shared<Sphere>(lightTransform1, 0.6), 
+		2)
+	);
 
-	// Light
-	Transform t3;
-	t3.translate(0,0,0);
-	//scene->addPrimitive(std::make_shared<Sphere>(t3, 1.0, 2));
-	t3.translate(3, 0, -3);
-	//scene->addPrimitive(std::make_shared<Sphere>(t3, 0.5, 2));
-
+	// Plane
 	unsigned int planeIdxs[] = { 0, 1, 2, 0, 2, 3 };
 	glm::vec3 p[] = { 
-		glm::vec3(-10.5, -2, -10.5),
-		glm::vec3(-10.5, -2, 10.5),
-		glm::vec3(10.5, -2, 10.5),
-		glm::vec3(10.5, -2, -10.5),
+		glm::vec3(-10.5, 0, -10.5),
+		glm::vec3(-10.5, 0, 10.5),
+		glm::vec3(10.5, 0, 10.5),
+		glm::vec3(10.5, 0, -10.5),
 	};
 	glm::vec3 n[] = {
 		glm::vec3(0.0f, 1.0f, 0.0f),
@@ -65,37 +78,12 @@ int main(int argv, char* args[]) {
 		n,
 		nullptr);
 	for (int i = 0; i < 2; ++i) {
-		scene->addPrimitive(std::make_shared<Triangle>(trimesh, i, 1));
+		scene->addPrimitive(std::make_shared<Primitive>(std::make_shared<Triangle>(trimesh, i), 1));
 	}
 
-	glm::vec3 p1[] = {
-	glm::vec3(-2.5, 0, -2.5),
-	glm::vec3(-2.5, 0, 2.5),
-	glm::vec3(2.5,0, 2.5),
-	glm::vec3(2.5, 0, -2.5),
-	};
-	glm::vec3 negN[] = {
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-		glm::vec3(0.0f, -1.0f, 0.0f),
-	};
-	Transform lightTransform;
-	//lightTransform.rotate(glm::radians(-45.0), glm::fvec3(0.0, 0.0, 1.0));
-	lightTransform.translate(glm::fvec3(3, 2, -1));
-	//lightTransform.scale(2);
-	auto trimeshlight = std::make_shared<TriangleMesh>(lightTransform,
-		"PlaneLight", 2, 4,
-		planeIdxs,
-		p1,
-		negN,
-		nullptr);
-	for (int i = 0; i < 2; ++i) {
-		scene->addPrimitive(std::make_shared<Triangle>(trimeshlight, i, 2));
-	}
-
+	// Camera
 	std::shared_ptr<Camera::Camera> cam = std::make_unique<Camera::Perspective>(
-				glm::vec3{1.0f, 0.1f, 5.0f}, 			// Origin
+				glm::vec3{-0.3f, 0.4f, 1.4f}, 			// Origin
 				glm::vec3{0.0, 0.0, -1.0f},				// LookAt
 				glm::vec3{0.0, 1.0, 0.0f},				// Up
 				glm::vec2{opts.width, opts.height},		// Screenbounds
