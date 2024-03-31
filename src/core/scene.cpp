@@ -26,11 +26,14 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 	bool hasHit = false;
 	float closest = tMax;
 
-	for(const auto &p : primitives){
+	// for(const auto &p : primitives){
+	for (auto i = 0; i < primitives.size(); ++i) {
+		const auto& p = primitives.at(i);
 		if (p->hit(ray, tMin, closest, tmp)) {
 			hasHit = true;
 			closest = tmp.t;
 			rec = tmp;
+			rec.geomIdx = i;
 		}
 	}
 	return hasHit;
@@ -66,6 +69,11 @@ void Scene::addMaterial(const std::shared_ptr<Mat::Material> &m) {
 const std::shared_ptr<Mat::Material> Scene::getMaterial(const uint64_t idx) const {
 	if(idx < 0 || idx >= this->materials.size()) return nullptr;
 	return materials[idx];
+}
+
+const std::shared_ptr<Primitive> Scene::getPrimitive(const uint64_t idx) const {
+	if(idx < 0 || idx >= this->primitives.size()) return nullptr;
+	return primitives[idx];
 }
 
 void Scene::setCamera(const std::shared_ptr<Camera::Camera> &cam){

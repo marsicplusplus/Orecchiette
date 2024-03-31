@@ -41,6 +41,7 @@ class Scene {
 		bool isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const;
 
 		const std::shared_ptr<Mat::Material> getMaterial(const uint64_t idx) const;
+		const std::shared_ptr<Primitive> getPrimitive(const uint64_t idx) const;
 
 		const std::shared_ptr<Camera::Camera> getCamera() const;
 		void setCamera(const std::shared_ptr<Camera::Camera> &cam);

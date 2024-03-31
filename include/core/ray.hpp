@@ -30,6 +30,7 @@ struct HitRecord{
 	bool frontFace;
 	float t;
 	uint64_t materialIdx;
+	uint64_t geomIdx;
 
 	inline void setFaceNormal(const Ray& r, const glm::vec3& outNormal) {
 		frontFace = dot(r.direction, outNormal) < 0;

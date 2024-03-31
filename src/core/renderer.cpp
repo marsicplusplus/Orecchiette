@@ -100,9 +100,8 @@ void Renderer::start(){
 		glfwSwapBuffers(this->window);
 	}
 }
-#if 1
+
 Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
-	Ray newRay;
 	HitRecord hr;
 
 	if (depth > MAX_DEPTH) {
@@ -112,6 +111,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
 #if 0
 		glm::vec3 Ei = BLACK;
+		/* Direct Light */
 		for (int i = 0; i < scene->numberOfLights(); ++i){
 			glm::vec3 pointOnLight, lightNormal;
 			float lightArea;
@@ -130,18 +130,32 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 			float solidAngle = (cosO * emitter->area()) / (dist * dist);
 			Ei += brdf * emitter->color * solidAngle * cosI;
 		}
-		return Ei * ((float)scene->numberOfLights());
-#else
+		/* Indirect Light */
 		auto material = scene->getMaterial(hr.materialIdx);
 		float pdf;
 		glm::vec3 brdf;
 		if(material->reflect(ray, newRay, pdf, brdf, hr, sampler)) {
-			glm::vec3 Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
+			Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
 			return brdf * Ei;
 		} else {
 			return material->albedo;
 		}
-#endif
+
+		return Ei / ((float)scene->numberOfLights());
+#else
+		auto material = scene->getMaterial(hr.materialIdx);
+		auto primitive = scene->getPrimitive(hr.geomIdx);
+		glm::vec3 Ei = BLACK;
+		if (primitive->light != nullptr) { // We hit a light
+			return material->albedo; // light->Le();
+		}
+		float pdf;
+		glm::vec3 brdf;
+		Ray newRay;
+		material->reflect(ray, newRay, pdf, brdf, hr, sampler);
+		Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
+		return brdf * Ei;
+		#endif
 	} else {
 		// No hit
 		// sky
@@ -151,61 +165,6 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 		return BLACK;
 	}
 }
-#else
-Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth){
-	Ray newRay;
-	HitRecord hr;
-#if 0
-	if(scene->traverse(ray, EPS, INF, hr, sampler)){
-		auto material = scene->getMaterial(hr.materialIdx);
-		if(material->getType() == Mat::MaterialType::EMISSIVE){
-			return lastSpecular * material->albedo;
-		}
-
-		glm::vec3 Ei(0.0f), brdf;
-		float pdf = 1.0f;
-
-		/* Indirect */
-		material->reflect(ray, newRay, pdf, brdf, hr, sampler);
-		Ei = (trace(newRay, 0.0f) * glm::dot(hr.normal, newRay.direction) / (float)pdf);
-
-		/* Direct Sampling */
-		glm::vec3 pointOnLight, normalOnLight;
-		float A, distance;
-		auto light = scene->sampleLights(sampler, pointOnLight, normalOnLight, A);
-		glm::vec3 dir = glm::normalize(pointOnLight - hr.point);
-		float lightP = 1.0f/(float)scene->numberOfLights();
-
-		float dist = glm::distance(pointOnLight, hr.point);
-		Ray occRay(hr.point + EPS*dir, dir);
-		float NlL = glm::dot(normalOnLight, -dir);
-		float NL = glm::dot(hr.normal, dir);
-		glm::vec3 Ld(0.0f);
-		bool occl = scene->isOccluded(occRay, light, dist);
-		if(NL > 0 && NlL > 0 && !occl){
-			float solidAngle = (NlL * A)/(dist*dist);
-			Ld = (float) scene->numberOfLights() * light->color * light->intensity *  solidAngle * NL * brdf;
-		}
-		return PI * 2.0f * brdf * Ei + Ld;
-	}
-	return BLACK;
-#else
-	if(scene->traverse(ray, EPS, INF, hr, sampler)){
-		auto material = scene->getMaterial(hr.materialIdx);
-		if(material->getType() == Mat::MaterialType::EMISSIVE){
-			return material->albedo * 1.0f;
-		} else if(material->getType() == Mat::MaterialType::DIFFUSE){
-			glm::vec3 brdf;
-			float pdf;
-			material->reflect(ray, newRay, pdf, brdf, hr, sampler);
-			auto Ei = trace(newRay) * glm::dot(hr.normal, newRay.direction)/pdf;
-			return PI * 2.0f * brdf * Ei;
-		}
-	}
-	return BLACK;
-#endif
-}
-#endif
 
 bool Renderer::init() {
 	glfwInit();
