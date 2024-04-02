@@ -8,7 +8,7 @@
 namespace{
 	glm::vec3 cosineSampling(const float &r1, const float &r2)
 	{
-		float phi = 2.0f * M_PI * r1;
+		float phi = 2.0f * PI * r1;
 
 		float x = cos(phi) * sqrt(r2);
 		float y = sin(phi) * sqrt(r2);
@@ -44,7 +44,7 @@ namespace Mat
 			dir = -dir;
 		reflectedRay.origin = hr.point + EPS * dir;
 		reflectedRay.direction = dir;
-		pdf = glm::dot(hr.normal, dir) / M_PI;
+		pdf = glm::dot(hr.normal, dir) / PI;
 		return true;
 	}
 

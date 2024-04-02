@@ -118,7 +118,7 @@ bool Triangle::hit(const Ray& ray, const float tMin, const float tMax, HitRecord
 	return false;
 }
 
-void Triangle::sample(std::shared_ptr<Sampler>& sampler, glm::vec3& point, glm::vec3& normal) const {
+void Triangle::sample(std::shared_ptr<Sampler>& sampler, glm::vec3& point, glm::vec3& normal, float &pdf) const {
 	glm::fvec3* v0 = &(this->mesh->p.get())[vIdx[0]];
 	glm::fvec3* v1 = &(this->mesh->p.get())[vIdx[1]];
 	glm::fvec3* v2 = &(this->mesh->p.get())[vIdx[2]];

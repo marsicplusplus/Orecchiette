@@ -101,6 +101,7 @@ void Renderer::start(){
 	}
 }
 
+#define DIRECT true
 Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 	HitRecord hr;
 
@@ -109,59 +110,34 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth) {
 	}
 
 	if(scene->traverse(ray, EPS, INF, hr, sampler)){
-#if 0
-		glm::vec3 Ei = BLACK;
-		/* Direct Light */
-		for (int i = 0; i < scene->numberOfLights(); ++i){
-			glm::vec3 pointOnLight, lightNormal;
-			float lightArea;
-			auto emitter = scene->sampleLight(sampler, i, pointOnLight, lightNormal, lightArea);
-			glm::vec3 L = pointOnLight - hr.point;
-			float dist = L.length();
-			L /= dist;
-			float cosO = glm::dot(-L, lightNormal);
-			float cosI = glm::dot(L, hr.normal);
-			if((cosO <= 0) || (cosI <= 0)) return BLACK;
-			Ray r = Ray(hr.point + EPS * L, L);
-			HitRecord hrDirect;
-			if(!scene->traverse(r, EPS, INF, hrDirect, sampler)) return BLACK;
-			auto material = scene->getMaterial(hr.materialIdx);
-			glm::vec3 brdf = material->brdf(ray.direction, r.direction);
-			float solidAngle = (cosO * emitter->area()) / (dist * dist);
-			Ei += brdf * emitter->color * solidAngle * cosI;
-		}
-		/* Indirect Light */
-		auto material = scene->getMaterial(hr.materialIdx);
-		float pdf;
-		glm::vec3 brdf;
-		if(material->reflect(ray, newRay, pdf, brdf, hr, sampler)) {
-			Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
-			return brdf * Ei;
-		} else {
-			return material->albedo;
-		}
-
-		return Ei / ((float)scene->numberOfLights());
-#else
 		auto material = scene->getMaterial(hr.materialIdx);
 		auto primitive = scene->getPrimitive(hr.geomIdx);
 		glm::vec3 Ei = BLACK;
 		if (primitive->light != nullptr) { // We hit a light
-			return material->albedo; // light->Le();
+			return primitive->light->color; // light->Le();
 		}
+		glm::vec3 directLight(0.0);
+	#if DIRECT
+		for(int i = 0; i < scene->numberOfLights(); ++i) {
+			auto light = scene->getEmitter(i);
+			if (primitive->light == light) continue;
+			float pdf;
+			glm::vec3 wi;
+			Ray visibilityRay;
+			auto li = light->li(sampler, hr, visibilityRay, wi, pdf);
+			bool isVisibile = scene->visibilityCheck(visibilityRay, EPS, INF, sampler);
+			li *= isVisibile;
+			directLight += li;
+		}
+	#endif
 		float pdf;
 		glm::vec3 brdf;
 		Ray newRay;
 		material->reflect(ray, newRay, pdf, brdf, hr, sampler);
 		Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / pdf;
-		return brdf * Ei;
-		#endif
+		return brdf * (Ei + directLight);
 	} else {
 		// No hit
-		// sky
-        // auto unitDir = ray.direction;
-        // float t = 0.5f*(unitDir.y + 1.0f);
-        // return ((1.0f-t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f)) * 0.3f;
 		return BLACK;
 	}
 }

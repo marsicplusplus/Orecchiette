@@ -6,10 +6,10 @@
 
 class Area : public Emitter {
 	public:
-		Area(const std::shared_ptr<Shape> &shape, const Color &c, float intensity = 10.0f)
-			: Emitter(Transform(), c, intensity), shape(shape) {}
+		Area(const std::shared_ptr<Shape> &shape, const Color &c)
+			: Emitter(Transform(), c), shape(shape) {}
 
-		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const;
+		glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf) const override;
 		virtual float area() const;
 
 	private:

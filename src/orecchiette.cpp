@@ -6,6 +6,7 @@
 #include "cameras/perspective.hpp"
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
+#include "emitters/point_light.hpp"
 
 int main(int argv, char* args[]) {
 	plog::init(plog::debug, "log.csv", 100000, 5);
@@ -44,16 +45,23 @@ int main(int argv, char* args[]) {
 	);
 	// Lights
 	Transform lightTransform;
-	lightTransform.translate(glm::fvec3(-1, 2.4, -3));
+	lightTransform.translate(glm::fvec3(-1, 3.0, -3));
 	scene->addPrimitive(std::make_shared<Primitive>(
 		std::make_shared<Sphere>(lightTransform, 0.4), 
 		2)
 	);
+
 	Transform lightTransform1;
-	lightTransform1.translate(glm::fvec3(0.5, 2.0, -2));
+	lightTransform1.translate(glm::fvec3(1.0, 3.0, -2));
 	scene->addPrimitive(std::make_shared<Primitive>(
 		std::make_shared<Sphere>(lightTransform1, 0.6), 
 		2)
+	);
+
+	Transform lightTransform2;
+	lightTransform2.translate(glm::fvec3(0.0f, 1.0, 2.0f));
+	scene->addLight(
+		std::make_shared<PointLight>(lightTransform2, RED)
 	);
 
 	// Plane

@@ -20,6 +20,18 @@ bool Scene::update(float dt) {
 	return ret;
 }
 
+bool Scene::visibilityCheck(const Ray &ray, const float tMin, const float tMax, std::shared_ptr<Sampler> sampler) {
+	HitRecord tmp;
+	tmp.point = {INF, INF, INF};
+
+	for (const auto &p : primitives) {
+		if (p->hit(ray, tMin, tMax, tmp)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler) {
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
@@ -39,20 +51,6 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 	return hasHit;
 }
 
-const std::shared_ptr<Emitter> Scene::sampleLight(std::shared_ptr<Sampler> &sampler, uint32_t idx, glm::vec3 &point, glm::vec3 &normal, float &area) {
-	lights[idx]->sample(sampler, point, normal);
-	area = lights[idx]->area();
-	return lights[idx];
-}
-
-const std::shared_ptr<Emitter> Scene::sampleLights(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &area) {
-	float f = sampler->getSample();
-	int idx = (f == 1.0 ? lights.size()-1 : f*lights.size());
-	lights[idx]->sample(sampler, point, normal);
-	area = lights[idx]->area();
-	return lights[idx];
-}
-
 bool Scene::isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const {
 	HitRecord hr;
 	for(const auto &p : primitives){
@@ -66,9 +64,18 @@ void Scene::addMaterial(const std::shared_ptr<Mat::Material> &m) {
 	materials.emplace_back(m);
 }
 
+void Scene::addLight(const std::shared_ptr<Emitter> &m) {
+	lights.emplace_back(m);
+}
+
 const std::shared_ptr<Mat::Material> Scene::getMaterial(const uint64_t idx) const {
 	if(idx < 0 || idx >= this->materials.size()) return nullptr;
 	return materials[idx];
+}
+
+const std::shared_ptr<Emitter> Scene::getEmitter(const uint64_t idx) const {
+	if(idx < 0 || idx >= this->lights.size()) return nullptr;
+	return lights[idx];
 }
 
 const std::shared_ptr<Primitive> Scene::getPrimitive(const uint64_t idx) const {
@@ -86,7 +93,7 @@ const std::shared_ptr<Camera::Camera> Scene::getCamera() const {
 
 void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 	if(materials[p->material]->getType() == Mat::EMISSIVE){
-		auto light = std::make_shared<Area>(p->shape, materials[p->material]->albedo, 5.0f);
+		auto light = std::make_shared<Area>(p->shape, materials[p->material]->albedo);
 		lights.push_back(light);
 		p->light = light;
 	}

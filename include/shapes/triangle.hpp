@@ -27,7 +27,7 @@ class Triangle : public Shape {
 		Triangle(const std::shared_ptr<TriangleMesh> &mesh, unsigned int triangleNumber);
 		bool hit(const Ray& ray, const float tMin, const float tMax, HitRecord& rec) const override;
 		float area() const override;
-		void sample(std::shared_ptr<Sampler>& sampler, glm::vec3& point, glm::vec3& normal) const override;
+		void sample(std::shared_ptr<Sampler>& sampler, glm::vec3& point, glm::vec3& normal, float &pdf) const override;
 
 	private:
 		std::shared_ptr<TriangleMesh> mesh;

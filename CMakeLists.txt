@@ -35,6 +35,7 @@ set( SRC
 	 src/core/thread_pool.cpp
 	 src/core/primitive.cpp
 	 src/emitters/area.cpp
+	 src/emitters/point_light.cpp
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
 	 src/shapes/sphere.cpp
@@ -46,10 +47,9 @@ set( SRC
 	 src/managers/input_manager.cpp
 	)
 
-add_executable( Orecchiette WIN32 ${SRC})
+add_executable( Orecchiette ${SRC})
 target_link_libraries( Orecchiette 
 						glfw 
-						# glog::glog
 					)
 target_compile_options( Orecchiette PRIVATE )
 set_property(TARGET Orecchiette PROPERTY CXX_STANDARD 17)

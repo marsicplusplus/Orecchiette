@@ -42,22 +42,22 @@ float Sphere::area() const {
 	return A;
 }
 
-void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const {
-	float u = sampler->getSample();
-	float v = sampler->getSample();
-	float theta = u * 2.0f * PI;
-	float phi = acos(2.0 * v - 1.0);
-	float r = cbrt(sampler->getSample());
-	float sinTheta = sin(theta);
-	float cosTheta = cos(theta);
-	float sinPhi = sin(phi);
-	float cosPhi = cos(phi);
-	auto &t = this->obj2World.getTranslation();
-	float x = t.x + this->radius * (r * sinPhi * cosTheta);
-	float y = t.y + this->radius * (r * sinPhi * sinTheta);
-	float z = t.z + this->radius * (r * cosPhi);
-	glm::vec3 ret{x, y, z};
+glm::vec3 sampleUniformSphere(std::shared_ptr<Sampler> &sampler) {
+	float z = 1 - 2 * sampler->getSample();
+	float r = sqrt(1 - sqrt(z));
+	float phi = 2 * PI * sampler->getSample();
+	return glm::vec3(
+		r * cos(phi),
+		r * sin(phi),
+		z
+	);
+}
 
-	point = (this->obj2World.getMatrix() * glm::vec4(ret, 1.0f)) * this->radius;
-	normal = glm::normalize(-(ret - t)/this->radius);
+void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const {
+	point = glm::vec3(0.0) + radius * sampleUniformSphere(sampler);
+	point *= radius / glm::distance(point, glm::vec3(0.0));
+
+	normal = normalize(obj2World.getMatrix() * glm::vec4(point, 0.0));
+	point = obj2World.getMatrix() * glm::vec4(point, 1.0);
+	pdf = 1.0;
 }

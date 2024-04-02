@@ -10,8 +10,8 @@ bool Primitive::hit(const Ray &ray, const float tMin, const float tMax, HitRecor
     return false;
 }
 
-void Primitive::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const {
-    this->shape->sample(sampler, point, normal);
+void Primitive::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const {
+    this->shape->sample(sampler, point, normal, pdf);
 }
 
 float Primitive::area() const {

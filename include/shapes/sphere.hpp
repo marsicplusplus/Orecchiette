@@ -7,7 +7,7 @@ class Sphere : public Shape {
 	public:
 		Sphere(const Transform &o2w, float radius);
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const override;
-		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal) const override;
+		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const override;
 		virtual float area() const override;
 
 	private:
