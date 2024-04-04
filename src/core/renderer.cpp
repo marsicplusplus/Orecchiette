@@ -205,7 +205,7 @@ bool Renderer::init()
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;
 	nFrames = 0;
-	Threading::pool.init(8);
+	Threading::pool.init(std::thread::hardware_concurrency() - 1.0);
 	return isInitialized;
 }
 

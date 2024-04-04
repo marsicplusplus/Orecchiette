@@ -1,0 +1,113 @@
+scene_name = "Dark room"
+description = "Dark (infinite) room, two spheres and two lights"
+
+######## RENDER CONFIGS ########
+width = 900
+height = 600
+nSamples = 1
+maxBounces = 3
+
+######## CAMERA ########
+[camera]
+origin = [-0.3, 0.7, 1.8]
+lookAt = [0.0, 0.0, -1.0]
+up = [0.0, 1.0, 0.0]
+fov = 90.0
+
+## MATERIALS ##
+
+[[material]]
+name = "DiffuseRed"
+type = "DIFFUSE"
+albedo = [1.0, 0.0, 0.0]
+
+[[material]]
+name = "DiffuseWhite"
+type = "DIFFUSE"
+albedo = [1.0, 1.0, 1.0]
+  
+[[material]]
+name = "DiffuseGreen"
+type = "DIFFUSE"
+albedo = [0.0, 1.0, 0.0]
+
+[[material]]
+name = "WhiteLight"
+type = "EMISSIVE"
+albedo = [1.0, 1.0, 1.0]
+
+######## SHAPES ########
+
+[[shape]]
+name = "LightSphere1"
+type = "SPHERE"
+radius = 0.4
+
+[[shape]]
+name = "LightSphere2"
+type = "SPHERE"
+radius = 0.6
+
+[[shape]]
+name = "Sphere1"
+type = "SPHERE"
+radius = 1.0
+
+[[shape]]
+name = "Sphere2"
+type = "SPHERE"
+radius = 0.8
+
+[[shape]]
+name = "FloorRect"
+type = "RECT"
+
+######## TRANSFORMS ########
+
+[[transform]]
+name = "Transform1"
+translation = [-1.5, 1.0, -3.0]
+
+[[transform]]
+name = "Transform2"
+translation = [1.4, 0.8, -1.4]
+
+[[transform]]
+name = "LightTransform1"
+translation = [-1.0, 3.0, -3.0]
+
+[[transform]]
+name = "LightTransform2"
+translation = [1.0, 3.0, -2.0]
+
+######## Primitives ########
+
+[[primitive]]
+name = "FloorPrimitive"
+shape = "FloorRect"
+transform = "FloorTransform"
+material = "DiffuseWhite"
+
+[[primitive]]
+name = "Sphere1Primitive"
+shape = "Sphere1"
+transform = "Transform1"
+material = "DiffuseRed"
+
+[[primitive]]
+name = "Sphere2Primitive"
+shape = "Sphere2"
+transform = "Transform2"
+material = "DiffuseGreen"
+
+[[primitive]]
+name = "Light1"
+shape = "LightSphere1"
+transform = "LightTransform1"
+material = "WhiteLight"
+
+[[primitive]]
+name = "Light2"
+shape = "LightSphere2"
+transform = "LightTransform2"
+material = "WhiteLight"

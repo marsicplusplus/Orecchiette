@@ -5,8 +5,8 @@
 Options::Options() {
 	width 		= 768;
 	height 		= 432;
-	tileH 		= 8;
-	tileW 		= 8;
+	tileH 		= 16;
+	tileW 		= 16;
 	title 		= "Orecchiette";
 	scaling		= 1;
 	nThreads 	= 1;

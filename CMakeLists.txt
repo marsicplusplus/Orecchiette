@@ -39,7 +39,7 @@ set( SRC
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
 	 src/shapes/sphere.cpp
-	 src/shapes/xyrect.cpp
+	 src/shapes/xzrect.cpp
 	 src/shapes/triangle.cpp
 	 src/cameras/perspective.cpp
 	 src/samplers/xorshift.cpp
