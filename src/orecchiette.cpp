@@ -93,7 +93,7 @@ int main(int argv, char* args[]) {
 	// 	std::make_shared<XZRect>(wallRight),
 	// 	4
 	// ));
-
+	/*
 	Transform lightPlane;
 	lightPlane.translate(0.0, 1.0, -2.0);
 	lightPlane.scale(1.0, 1.0, 0.5);
@@ -102,7 +102,7 @@ int main(int argv, char* args[]) {
 		std::make_shared<XZRect>(lightPlane),
 		5
 	));
-
+	*/
 	// Transform wallBack;
 	// wallBack.translate(0.0, 0.0, -5.0);
 	// wallBack.scale(15.0);

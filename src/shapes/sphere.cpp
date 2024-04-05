@@ -59,5 +59,5 @@ void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::ve
 
 	normal = normalize(obj2World.getMatrix() * glm::vec4(point, 0.0));
 	point = obj2World.getMatrix() * glm::vec4(point, 1.0);
-	pdf = 1.0;
+	pdf = 1.0 / area();
 }

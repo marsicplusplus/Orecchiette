@@ -14,6 +14,7 @@ class Shape {
 		virtual bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const = 0;
 		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const = 0;
 		virtual float area() const = 0;
+		float pdf(HitRecord hr, const glm::vec3 &wi) const { return 1.0 / area(); }
 
 		BoundingBox localBB;
 

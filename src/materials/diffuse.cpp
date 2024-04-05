@@ -5,7 +5,8 @@
 #include "glm/gtx/rotate_vector.hpp"
 
 #define UNIFORM_SAMPLING
-namespace{
+namespace
+{
 	glm::vec3 cosineSampling(const float &r1, const float &r2)
 	{
 		float phi = 2.0f * PI * r1;
@@ -36,7 +37,7 @@ namespace Mat
 		return Mat::MaterialType::DIFFUSE;
 	}
 
-	bool Diffuse::reflect(const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr, std::shared_ptr<Sampler> &sampler) const
+	bool Diffuse::sample(const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr, std::shared_ptr<Sampler> &sampler) const
 	{
 		brdf = this->albedo / PI;
 		auto dir = glm::normalize(diffuseReflection(hr, sampler));
@@ -48,7 +49,7 @@ namespace Mat
 		return true;
 	}
 
-	glm::vec3 Diffuse::brdf(glm::vec3 wo, glm::vec3 wi)
+	glm::vec3 Diffuse::brdf(const HitRecord &hr)
 	{
 		return this->albedo / PI;
 	}

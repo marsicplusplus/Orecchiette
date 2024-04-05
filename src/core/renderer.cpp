@@ -155,7 +155,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 		float reflectionPdf;
 		glm::vec3 brdf;
 		Ray newRay;
-		material->reflect(ray, newRay, reflectionPdf, brdf, hr, sampler);
+		material->sample(ray, newRay, reflectionPdf, brdf, hr, sampler);
 		Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 		return brdf * (Ei + directLight);
 #else
