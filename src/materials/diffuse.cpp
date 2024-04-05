@@ -37,7 +37,7 @@ namespace Mat
 		return Mat::MaterialType::DIFFUSE;
 	}
 
-	bool Diffuse::sample(const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr, std::shared_ptr<Sampler> &sampler) const
+	bool Diffuse::sample(std::shared_ptr<Sampler> &sampler, const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr) const
 	{
 		brdf = this->albedo / PI;
 		auto dir = glm::normalize(diffuseReflection(hr, sampler));

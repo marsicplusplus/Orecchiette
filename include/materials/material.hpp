@@ -18,7 +18,7 @@ class Material {
 		Material() {}
 		Material(const Color &c) : albedo(c) {}
 		virtual MaterialType getType() const = 0;
-		virtual bool sample(const Ray& in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &r, std::shared_ptr<Sampler> &sampler) const { return false;} ;
+		virtual bool sample(std::shared_ptr<Sampler> &sampler, const Ray& in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &r) const { return false;} ;
 		virtual glm::vec3 brdf(const HitRecord &hr) {return BLACK;};
 		Color albedo;
 };
