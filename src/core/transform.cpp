@@ -71,3 +71,11 @@ void Transform::updateMatrix(){
 	mInv = glm::inverse(m);
 	mInvTran = glm::transpose(mInv);
 }
+
+glm::vec3 Transform::transformPoint(const glm::vec3& p) const {
+	return this->m * glm::vec4(p, 1.0);
+}
+
+glm::vec3 Transform::transformNormal(const glm::vec3& n) const {
+	return this->mInvTran * glm::vec4(n, 0.0);
+}

@@ -9,7 +9,7 @@ class PointLight : public Emitter {
 				Emitter(o2w, c) {
 					pos = o2w.getMatrix() * glm::vec4(0.0, 0.0, 0.0, 1.0);
 				};
-			glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf) const override;
+			glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const override;
 
 		private:
 			glm::vec3 pos;

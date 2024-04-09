@@ -115,16 +115,15 @@ void Renderer::start()
 
 Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light)
 {
-	float pdf;
+	float pdf, dist;
 	glm::vec3 wi;
 	Ray visibilityRay;
-	auto li = light->li(sampler, hr, visibilityRay, wi, pdf);
-	if (scene->visibilityCheck(visibilityRay, EPS, INF, sampler))
+	auto li = light->li(sampler, hr, visibilityRay, wi, pdf, dist);
+	if (scene->visibilityCheck(visibilityRay, EPS, dist - EPS, sampler))
 	{
-		return material->brdf(hr) * li / pdf;
+		return material->brdf(hr, wi) * li / pdf;
 	}
 	return BLACK;
-
 }
 
 Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight)
@@ -139,10 +138,12 @@ Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std
 		if (hitLight != light)
 			break;
 	}
-	return estimateDirect(sampler, hr, material, light) * (float)scene->numberOfLights();
+	float pdf = 1.0f / scene->numberOfLights();
+	return estimateDirect(sampler, hr, material, light) / pdf;
 }
 
-#define INDIRECT_ONLY false
+// #define INDIRECT
+#define DIRECT
 Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 {
 	HitRecord hr;
@@ -150,29 +151,35 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 	{
 		return BLACK;
 	}
-
 	if (scene->traverse(ray, EPS, INF, hr, sampler))
 	{
 		auto material = scene->getMaterial(hr.materialIdx);
 		auto primitive = scene->getPrimitive(hr.geomIdx);
-		glm::vec3 Ei = BLACK;
-#if not INDIRECT_ONLY
+		glm::vec3 Ei = BLACK;	
+#ifdef DIRECT
 		if (primitive->light != nullptr)
 		{									// We hit a light
-			return primitive->light->color; // light->Le();
+			if(depth == 0)
+				return primitive->light->color; // light->Le();
+			else
+				return BLACK;
 		}
 		auto directLight = sampleLights(sampler, hr, material, primitive->light);
 		float reflectionPdf;
 		glm::vec3 brdf;
 		Ray newRay;
 		material->sample(sampler, ray, newRay, reflectionPdf, brdf, hr);
-		Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
-		return brdf * (Ei + directLight);
+		Ei = brdf * trace(newRay, lastSpecular, depth + 1) / reflectionPdf;
+		return (Ei + directLight);
 #else
+		if (primitive->light != nullptr)
+		{									// We hit a light
+			return primitive->light->color; // light->Le();
+		}
 		float reflectionPdf;
 		glm::vec3 brdf;
 		Ray newRay;
-		material->reflect(ray, newRay, reflectionPdf, brdf, hr, sampler);
+		material->sample(sampler, ray, newRay, reflectionPdf, brdf, hr);
 		Ei = trace(newRay, lastSpecular, depth + 1) * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 		return brdf * (Ei);
 #endif
@@ -216,6 +223,7 @@ bool Renderer::init()
 	isInitialized = true;
 	nFrames = 0;
 	Threading::pool.init(std::thread::hardware_concurrency() - 1.0);
+	// Threading::pool.init(1);
 	return isInitialized;
 }
 

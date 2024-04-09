@@ -55,22 +55,19 @@ int main(int argv, char* args[]) {
 	// );
 
 	Transform lightTransform1;
-	lightTransform1.translate(glm::fvec3(0.0, 3.2, -2));
-	scene->addPrimitive(std::make_shared<Primitive>(
-		std::make_shared<Sphere>(lightTransform1, 0.8), 
-		2)
-	);
-
-	// Transform lightTransform2;
-	// lightTransform2.translate(glm::fvec3(0.0f, 1.0, 2.0f));
-	// scene->addLight(
-	// 	std::make_shared<PointLight>(lightTransform2, RED)
+	lightTransform1.translate(glm::fvec3(0.2, 3.2, -1.4));
+	// scene->addPrimitive(std::make_shared<Primitive>(
+	// 	std::make_shared<Sphere>(lightTransform1, 0.8), 
+	// 	2)
 	// );
+	scene->addLight(
+		std::make_shared<PointLight>(lightTransform1, WHITE * 15.0f)
+	);
 
 	Transform t2;
 	t2.scale(10.5, 1, 15.5);
 	t2.translate(0.0, 0.0, -5.0);
-	// t2.rotate(-90.0, glm::vec3(1.0, 0.0, 0.0));
+	// t2.rotate(-180.0, glm::vec3(1.0, 0.0, 0.0));
 	scene->addPrimitive(std::make_shared<Primitive>(
 		std::make_shared<XZRect>(t2),
 		4
@@ -93,16 +90,16 @@ int main(int argv, char* args[]) {
 	// 	std::make_shared<XZRect>(wallRight),
 	// 	4
 	// ));
-	/*
-	Transform lightPlane;
-	lightPlane.translate(0.0, 1.0, -2.0);
-	lightPlane.scale(1.0, 1.0, 0.5);
-	lightPlane.rotate(glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
-	scene->addPrimitive(std::make_shared<Primitive>(
-		std::make_shared<XZRect>(lightPlane),
-		5
-	));
-	*/
+
+	// Transform lightPlane;
+	// lightPlane.translate(0.0, 1.0, -2.0);
+	// lightPlane.scale(1.0, 1.0, 0.5);
+	// lightPlane.rotate(glm::radians(90.0f), glm::vec3(1.0, 0.0, 0.0));
+	// scene->addPrimitive(std::make_shared<Primitive>(
+	// 	std::make_shared<XZRect>(lightPlane),
+	// 	5
+	// ));
+
 	// Transform wallBack;
 	// wallBack.translate(0.0, 0.0, -5.0);
 	// wallBack.scale(15.0);

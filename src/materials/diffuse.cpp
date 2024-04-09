@@ -7,7 +7,7 @@
 #define UNIFORM_SAMPLING
 namespace
 {
-	glm::vec3 cosineSampling(const float &r1, const float &r2)
+	glm::vec3 cosineSampling(const float r1, const float r2)
 	{
 		float phi = 2.0f * PI * r1;
 
@@ -39,18 +39,16 @@ namespace Mat
 
 	bool Diffuse::sample(std::shared_ptr<Sampler> &sampler, const Ray &in, Ray &reflectedRay, float &pdf, glm::vec3 &brdf, const HitRecord &hr) const
 	{
-		brdf = this->albedo / PI;
 		auto dir = glm::normalize(diffuseReflection(hr, sampler));
-		if (glm::dot(hr.normal, dir) < 0)
-			dir = -dir;
 		reflectedRay.origin = hr.point + EPS * dir;
 		reflectedRay.direction = dir;
 		pdf = glm::dot(hr.normal, dir) / PI;
+		brdf = glm::dot(hr.normal, dir) * this->albedo / PI;
 		return true;
 	}
 
-	glm::vec3 Diffuse::brdf(const HitRecord &hr)
+	glm::vec3 Diffuse::brdf(const HitRecord &hr, glm::vec3 wi)
 	{
-		return this->albedo / PI;
+		return glm::dot(hr.normal, wi) * this->albedo / PI;
 	}
 }

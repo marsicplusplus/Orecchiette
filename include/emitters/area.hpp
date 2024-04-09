@@ -9,7 +9,7 @@ class Area : public Emitter {
 		Area(const std::shared_ptr<Shape> &shape, const Color &c)
 			: Emitter(Transform(), c), shape(shape) {}
 
-		glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf) const override;
+		glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const override;
 		virtual float area() const;
 
 	private:

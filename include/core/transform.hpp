@@ -14,6 +14,9 @@ class Transform {
 		glm::mat4 getTransposeInverse() const;
 		glm::mat4 getInverse() const;
 
+		glm::vec3 transformPoint(const glm::vec3 &p) const;
+		glm::vec3 transformNormal(const glm::vec3 &n) const;
+
 		void scale(float uniform);
 		void scale(glm::vec3 &scaling);
 		void scale(float x, float y, float z);

@@ -31,10 +31,12 @@ bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord& 
 		return false;
 	}
 
-	glm::vec3 normal = (ray.at(root)) * invRadius;
+	glm::vec3 p = transformedRay.at(root);
+	glm::vec3 normal = glm::normalize(p * invRadius);
 	hr.t = root;
-	hr.point = ray.at(root);
-	hr.normal = normal;
+	hr.point = obj2World.transformPoint(p);
+	normal = obj2World.transformNormal(normal);
+	hr.setFaceNormal(ray, normal);
 	return true;
 }
 
@@ -44,7 +46,7 @@ float Sphere::area() const {
 
 glm::vec3 sampleUniformSphere(std::shared_ptr<Sampler> &sampler) {
 	float z = 1 - 2 * sampler->getSample();
-	float r = sqrt(1 - sqrt(z));
+	float r = sqrt(std::max(0.0f, 1.0f - z * z));
 	float phi = 2 * PI * sampler->getSample();
 	return glm::vec3(
 		r * cos(phi),
@@ -54,9 +56,7 @@ glm::vec3 sampleUniformSphere(std::shared_ptr<Sampler> &sampler) {
 }
 
 void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const {
-	point = glm::vec3(0.0) + radius * sampleUniformSphere(sampler);
-	point *= radius / glm::distance(point, glm::vec3(0.0));
-
+	point = radius * sampleUniformSphere(sampler);
 	normal = normalize(obj2World.getMatrix() * glm::vec4(point, 0.0));
 	point = obj2World.getMatrix() * glm::vec4(point, 1.0);
 	pdf = 1.0 / area();
