@@ -8,6 +8,7 @@
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
 #include "emitters/point_light.hpp"
+#include "emitters/directional.hpp"
 
 int main(int argv, char* args[]) {
 	plog::init(plog::debug, "log.csv", 100000, 5);
@@ -60,8 +61,12 @@ int main(int argv, char* args[]) {
 	// 	std::make_shared<Sphere>(lightTransform1, 0.8), 
 	// 	2)
 	// );
+
+	// scene->addLight(
+	// 	std::make_shared<PointLight>(lightTransform1, WHITE * 10.0f)
+	// );
 	scene->addLight(
-		std::make_shared<PointLight>(lightTransform1, WHITE * 15.0f)
+		std::make_shared<Directional>(glm::vec3(0.8, 0.0, -.2), WHITE * 2.0f)
 	);
 
 	Transform t2;

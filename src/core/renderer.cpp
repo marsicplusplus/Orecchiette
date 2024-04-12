@@ -140,6 +140,8 @@ Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std
 	}
 	float pdf = 1.0f / scene->numberOfLights();
 	return estimateDirect(sampler, hr, material, light) / pdf;
+	// std::shared_ptr<Emitter> light = scene->getEmitter(0);
+	// return estimateDirect(sampler, hr, material, light);
 }
 
 // #define INDIRECT
@@ -171,6 +173,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 		material->sample(sampler, ray, newRay, reflectionPdf, brdf, hr);
 		Ei = brdf * trace(newRay, lastSpecular, depth + 1) / reflectionPdf;
 		return (Ei + directLight);
+		// return directLight;
 #else
 		if (primitive->light != nullptr)
 		{									// We hit a light

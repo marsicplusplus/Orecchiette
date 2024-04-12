@@ -3,10 +3,10 @@
 #include "emitters/area.hpp"
 #include <iostream>
 
-Scene::Scene() {/*TODO empty/default scene?*/
+Scene::Scene() : m_bbox(nullptr) {/*TODO empty/default scene?*/
 	/* Create default empty material */
 }
-Scene::Scene(const std::string &fp) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
+Scene::Scene(const std::string &fp) : m_bbox(nullptr) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
 
 int Scene::numberOfLights() const {
 	return lights.size();
@@ -100,4 +100,19 @@ void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 	primitives.push_back(p);
 }
 
+void Scene::preprocessLights() {
+	// TODO:
+	// Compute scene bbox
+	// For every light, call preprocess with the bbox
+	if(m_bbox == nullptr) {
+		m_bbox = new BoundingBox();
+		for(const auto &p : primitives) {
+			m_bbox->grow(p->getBBox());
+		}
+	}
+	for(const auto &l : lights) {
+		l->preprocess(*m_bbox);
+	}
+
+}
 

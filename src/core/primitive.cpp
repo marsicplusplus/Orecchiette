@@ -17,3 +17,7 @@ void Primitive::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm:
 float Primitive::area() const {
     return shape->area();
 }
+
+BoundingBox Primitive::getBBox() const {
+    return shape->getBBox();
+}

@@ -15,6 +15,7 @@ class Primitive {
 		bool hit(const Ray &ray, const float tMin, const float tMax, HitRecord& hr) const;
 		void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const;
 		float area() const;
+		BoundingBox getBBox() const;
 
 		int material;
 		std::shared_ptr<Emitter> light = 0;
