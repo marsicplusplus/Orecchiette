@@ -101,9 +101,6 @@ void Scene::addPrimitive(const std::shared_ptr<Primitive> &p){
 }
 
 void Scene::preprocessLights() {
-	// TODO:
-	// Compute scene bbox
-	// For every light, call preprocess with the bbox
 	if(m_bbox == nullptr) {
 		m_bbox = new BoundingBox();
 		for(const auto &p : primitives) {

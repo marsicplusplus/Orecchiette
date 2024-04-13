@@ -37,6 +37,7 @@ set( SRC
 	 src/emitters/area.cpp
 	 src/emitters/point_light.cpp
 	 src/emitters/directional.cpp
+	 src/emitters/spot_light.cpp
 	 src/materials/diffuse.cpp
 	 src/materials/emissive.cpp
 	 src/shapes/sphere.cpp

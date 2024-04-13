@@ -8,6 +8,7 @@
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
 #include "emitters/point_light.hpp"
+#include "emitters/spot_light.hpp"
 #include "emitters/directional.hpp"
 
 int main(int argv, char* args[]) {
@@ -56,7 +57,11 @@ int main(int argv, char* args[]) {
 	// );
 
 	Transform lightTransform1;
-	lightTransform1.translate(glm::fvec3(0.2, 3.2, -1.4));
+	lightTransform1.rotate(glm::radians(90.0), glm::vec3(1.0, 0.0, 0.0));
+	lightTransform1.translate(glm::fvec3(0.3, 2.0, -1.4));
+	scene->addLight(
+		std::make_shared<SpotLight>(lightTransform1, WHITE*5.0f, 45, 180)
+	);
 	// scene->addPrimitive(std::make_shared<Primitive>(
 	// 	std::make_shared<Sphere>(lightTransform1, 0.8), 
 	// 	2)
@@ -65,9 +70,9 @@ int main(int argv, char* args[]) {
 	// scene->addLight(
 	// 	std::make_shared<PointLight>(lightTransform1, WHITE * 10.0f)
 	// );
-	scene->addLight(
-		std::make_shared<Directional>(glm::vec3(0.8, 0.0, -.2), WHITE * 2.0f)
-	);
+	// scene->addLight(
+	// 	std::make_shared<Directional>(glm::vec3(0.8, 0.0, -.2), WHITE * 2.0f)
+	// );
 
 	Transform t2;
 	t2.scale(10.5, 1, 15.5);

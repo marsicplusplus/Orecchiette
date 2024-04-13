@@ -39,6 +39,9 @@ void Renderer::start()
 	const int horizontalTiles = wWidth / tWidth;
 	const int verticalTiles = wHeight / tHeight;
 	const int spp = this->opts.spp;
+
+	this->scene->preprocessLights();
+
 	while (!glfwWindowShouldClose(this->window))
 	{
 		glfwPollEvents();

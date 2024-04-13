@@ -16,7 +16,7 @@ class Emitter {
 		Emitter(const Transform &o2w, Color emission) : 
 			o2w(o2w), color(emission) {}
 		virtual glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const = 0;
-		void preprocess(BoundingBox bbox) {};
+		virtual void preprocess(BoundingBox bbox) {};
 
 		Color color;
 	protected:

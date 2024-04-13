@@ -5,6 +5,7 @@
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
 #include <cmath>
+#include <algorithm>
 #include <limits>
 
 const float INF 			= std::numeric_limits<float>::max();
