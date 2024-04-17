@@ -1,9 +1,6 @@
 #include "emitters/spot_light.hpp"
 
 
-float SpotLight::falloffLight(glm::vec3 &w) const {
-}
-
 glm::vec3 SpotLight::li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const {
 	wi = glm::normalize(m_pos - hr.point);
 	pdf = 1.0;

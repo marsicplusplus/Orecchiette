@@ -8,12 +8,12 @@ Sphere::Sphere(const Transform &o2w, float radius) : Shape(o2w),
 	glm::vec3 center = m_obj2World.transformPoint(glm::vec3(0.0));
 	m_bbox.min = center - radius;
 	m_bbox.max = center + radius;
-	A = 4.0f * PI * radius * radius;
+	A = 4.0f * PI * radiusSq;
 }
 
 bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord &hr) const
 {
-	Ray transformedRay = ray.transformRay(m_obj2World.getInverse());
+	Ray transformedRay = m_obj2World.transformRay(ray);
 	float a = glm::dot(transformedRay.direction, transformedRay.direction);
 	glm::vec3 oc = transformedRay.origin;
 	float halfB = glm::dot(transformedRay.direction, oc);
@@ -61,12 +61,14 @@ glm::vec3 sampleUniformSphere(std::shared_ptr<Sampler> &sampler)
 		z);
 }
 
+// #include <stdio.h>
 void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const
-{
-	point = radius * sampleUniformSphere(sampler);
-	normal = glm::normalize(m_obj2World.transformNormal(point));
-	point = m_obj2World.transformPoint(point);
-	pdf = 1.0 / area();
+{	
+	glm::vec3 local = sampleUniformSphere(sampler);
+	// printf("Local: [%.4f, %.4f, %.4f]\n", local.x, local.y, local.z);
+	normal = glm::normalize(local);
+	point = m_obj2World.transformPoint(radius * local);
+	pdf = 1.0f / area();
 }
 
 BoundingBox Sphere::getBBox() const

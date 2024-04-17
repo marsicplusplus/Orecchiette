@@ -43,12 +43,12 @@ namespace Mat
 		reflectedRay.origin = hr.point + EPS * dir;
 		reflectedRay.direction = dir;
 		pdf = glm::dot(hr.normal, dir) / PI;
-		brdf = glm::dot(hr.normal, dir) * this->albedo / PI;
+		brdf = this->albedo / PI;
 		return true;
 	}
 
 	glm::vec3 Diffuse::brdf(const HitRecord &hr, glm::vec3 wi)
 	{
-		return glm::dot(hr.normal, wi) * this->albedo / PI;
+		return this->albedo / PI;
 	}
 }

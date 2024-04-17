@@ -16,7 +16,7 @@ XZRect::XZRect(const Transform &obj2world) :
 	}
 
 bool XZRect::hit(const Ray &ray, const float tMin, const float tMax, HitRecord &hr) const {
-	auto transformedRay = ray.transformRay(m_obj2World.getInverse());
+	Ray transformedRay = m_obj2World.transformRay(ray);
 	glm::fvec3 normal(0.0f, 1.0f, 0.0f);
 	
 	float t = -transformedRay.origin.y / transformedRay.direction.y;

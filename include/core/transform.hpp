@@ -4,6 +4,7 @@
 #include "glm/vec3.hpp"
 #include "glm/mat4x4.hpp"
 #include "glm/gtx/quaternion.hpp"
+#include "core/ray.hpp"
 
 class Transform {
 	public:
@@ -16,6 +17,7 @@ class Transform {
 
 		glm::vec3 transformPoint(const glm::vec3 &p) const;
 		glm::vec3 transformNormal(const glm::vec3 &n) const;
+		Ray transformRay(const Ray &ray) const;
 
 		void scale(float uniform);
 		void scale(glm::vec3 &scaling);

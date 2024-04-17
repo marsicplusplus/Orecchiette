@@ -72,6 +72,15 @@ void Transform::updateMatrix(){
 	mInvTran = glm::transpose(mInv);
 }
 
+
+Ray Transform::transformRay(const Ray &ray) const
+{
+	return Ray(
+		this->mInv * glm::vec4(ray.origin, 1.0),
+		this->mInv * glm::vec4(ray.direction, 0.0)
+	);
+}
+
 glm::vec3 Transform::transformPoint(const glm::vec3& p) const {
 	return this->m * glm::vec4(p, 1.0);
 }

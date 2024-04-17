@@ -16,8 +16,6 @@ class SpotLight : public Emitter {
 		private:
 			glm::vec3 m_pos;
             float m_cosTotalWidth, m_cosFalloffStart;
-
-			float falloffLight(glm::vec3 &w) const;
 };
 
 #endif
