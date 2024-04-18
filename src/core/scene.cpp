@@ -20,11 +20,13 @@ bool Scene::update(float dt) {
 	return ret;
 }
 
-bool Scene::visibilityCheck(const Ray &ray, const float tMin, const float tMax, std::shared_ptr<Sampler> sampler) {
+bool Scene::visibilityCheck(const Ray &ray, const float tMin, const float tMax, std::shared_ptr<Emitter> hitLight) {
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
 
-	for (const auto &p : primitives) {
+	for (auto i = 0; i < primitives.size(); ++i) {
+		const auto& p = primitives.at(i);
+		if(p->light == hitLight) continue;
 		if (p->hit(ray, tMin, tMax, tmp)) {
 			return false;
 		}
@@ -32,13 +34,12 @@ bool Scene::visibilityCheck(const Ray &ray, const float tMin, const float tMax, 
 	return true;
 }
 
-bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler) {
+bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec) {
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
 	bool hasHit = false;
 	float closest = tMax;
 
-	// for(const auto &p : primitives){
 	for (auto i = 0; i < primitives.size(); ++i) {
 		const auto& p = primitives.at(i);
 		if (p->hit(ray, tMin, closest, tmp)) {
@@ -49,15 +50,6 @@ bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitReco
 		}
 	}
 	return hasHit;
-}
-
-bool Scene::isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const {
-	HitRecord hr;
-	for(const auto &p : primitives){
-		if (p->light != nullptr && p->light == light) continue;
-		else if (p->hit(ray, EPS, tMax, hr)) return true;
-	}
-	return false;
 }
 
 void Scene::addMaterial(const std::shared_ptr<Mat::Material> &m) {

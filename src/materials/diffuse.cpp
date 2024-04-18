@@ -42,13 +42,13 @@ namespace Mat
 		auto dir = glm::normalize(diffuseReflection(hr, sampler));
 		reflectedRay.origin = hr.point + EPS * dir;
 		reflectedRay.direction = dir;
-		pdf = glm::dot(hr.normal, dir) / PI;
-		brdf = this->albedo / PI;
+		pdf = glm::dot(hr.normal, dir) * ONE_OVER_PI;
+		brdf = this->albedo * ONE_OVER_PI;
 		return true;
 	}
 
 	glm::vec3 Diffuse::brdf(const HitRecord &hr, glm::vec3 wi)
 	{
-		return this->albedo / PI;
+		return this->albedo * ONE_OVER_PI;
 	}
 }

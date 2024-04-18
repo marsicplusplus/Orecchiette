@@ -11,37 +11,44 @@ Sphere::Sphere(const Transform &o2w, float radius) : Shape(o2w),
 	A = 4.0f * PI * radiusSq;
 }
 
+bool solveQuadratic(const float &a, const float &b, const float &c, 
+					float &x0, float &x1) {
+    float discr = b * b - 4 * a * c;
+    if (discr < 0) return false;
+    else if (discr == 0) x0 = x1 = -0.5 * b / a;
+    else {
+        float q = (b > 0) ?
+            -0.5 * (b + sqrt(discr)) :
+            -0.5 * (b - sqrt(discr));
+        x0 = q / a;
+        x1 = c / q;
+    }
+    if (x0 > x1) std::swap(x0, x1);
+    
+    return true;
+}
+
 bool Sphere::hit(const Ray &ray, const float tMin, const float tMax, HitRecord &hr) const
 {
-	Ray transformedRay = m_obj2World.transformRay(ray);
-	float a = glm::dot(transformedRay.direction, transformedRay.direction);
-	glm::vec3 oc = transformedRay.origin;
-	float halfB = glm::dot(transformedRay.direction, oc);
-	float c = glm::dot(oc, oc) - radiusSq;
-	float discriminant = halfB * halfB - a * c;
-	if (discriminant < 0.0f)
-	{
-		return false;
-	}
+	auto r = m_obj2World.transformRay(ray);
+	auto oc = 0.0f - r.origin;
+	float a = glm::length2(r.direction);
+	float h = glm::dot(r.direction, oc);
+	auto c = glm::length2(oc) - radiusSq;
 
-	float sqrtDiscr = std::sqrt(discriminant);
-	float root = (-halfB - sqrtDiscr) / a;
-	if (root < tMin)
-	{
-		root = (-halfB + sqrtDiscr) / a;
+	auto disc = h * h - a * c;
+	if(disc < 0) return false;
+	auto sqrtd = sqrt(disc);
+	auto root = (h - sqrtd) / a;
+	if (root <= tMin || tMax <= root) {
+		root = (h + sqrtd) / a;
+		if (root <= tMin || tMax <= root) 
+			return false;
 	}
-
-	if (root < EPS || root >= tMax)
-	{
-		return false;
-	}
-
-	glm::vec3 p = transformedRay.at(root);
-	glm::vec3 normal = glm::normalize(p * invRadius);
+	auto local = r.at(root);
 	hr.t = root;
-	hr.point = m_obj2World.transformPoint(p);
-	normal = m_obj2World.transformNormal(normal);
-	hr.setFaceNormal(ray, normal);
+	hr.point = ray.at(root);
+	hr.setFaceNormal(ray, local * invRadius);
 	return true;
 }
 
@@ -61,11 +68,9 @@ glm::vec3 sampleUniformSphere(std::shared_ptr<Sampler> &sampler)
 		z);
 }
 
-// #include <stdio.h>
 void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const
 {	
 	glm::vec3 local = sampleUniformSphere(sampler);
-	// printf("Local: [%.4f, %.4f, %.4f]\n", local.x, local.y, local.z);
 	normal = glm::normalize(local);
 	point = m_obj2World.transformPoint(radius * local);
 	pdf = 1.0f / area();

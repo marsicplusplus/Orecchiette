@@ -7,10 +7,16 @@ float Area::area() const {
 glm::vec3 Area::li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const {
 	glm::vec3 samplePoint, sampleNormal;
 	shape->sample(sampler, samplePoint, sampleNormal, pdf);
-	wi = glm::normalize(samplePoint - hr.point);
+	wi = (samplePoint - hr.point);
+	dist = glm::length(wi);
+	wi = glm::normalize(wi);
 	vRay.origin = hr.point + EPS * wi;
 	vRay.direction = wi;
-	dist = glm::length(wi);
-	auto solidAngle = (glm::dot(sampleNormal, -wi) * this->area()) / (dist * dist);
-    return this->color * solidAngle;
+	float cosT = glm::dot(sampleNormal, -wi);
+	auto solidAngle = (cosT * this->area()) / (dist * dist);
+	if(cosT > 0.0f) {
+    	return this->color * solidAngle;
+	} else {
+		return BLACK;
+	}
 }

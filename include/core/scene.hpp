@@ -32,12 +32,10 @@ class Scene {
 		 * @param tMin closest point on the ray direction;
 		 * @param tMax farthest point on the ray direction;
 		 * @param rec Hit Record to store information of the hit;
-		 * @param sampler Sampler used to obtain random numbers;
 		 * @return true if the ray intersects, false otherwhise.
 		 */
-		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec, std::shared_ptr<Sampler> sampler);
-		bool visibilityCheck(const Ray &ray, const float tMin, const float tMax, std::shared_ptr<Sampler> sampler);
-		bool isOccluded(const Ray &ray, const std::shared_ptr<Emitter> &light, float tMax) const;
+		bool traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec);
+		bool visibilityCheck(const Ray &ray, const float tMin, const float tMax, std::shared_ptr<Emitter> hitLight);
 
 		const std::shared_ptr<Mat::Material> getMaterial(const uint64_t idx) const;
 		const std::shared_ptr<Primitive> getPrimitive(const uint64_t idx) const;

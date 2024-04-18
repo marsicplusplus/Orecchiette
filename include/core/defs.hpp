@@ -9,7 +9,7 @@
 #include <limits>
 
 const float INF 			= std::numeric_limits<float>::max();
-const float EPS 			= 5e-4f;
+const float EPS 			= 1e-4;
 const float PI 				= 3.14159265358979323846f;
 const float ONE_OVER_PI		= 1.0f / 3.14159265358979323846f;
 const float ONE_OVER_2PI	= 1.0f / (2.0f * 3.14159265358979323846f);

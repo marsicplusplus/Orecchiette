@@ -22,12 +22,11 @@ bool XZRect::hit(const Ray &ray, const float tMin, const float tMax, HitRecord &
 	float t = -transformedRay.origin.y / transformedRay.direction.y;
 	auto p = transformedRay.at(t);
 	if (t >= EPS && t > tMin && t < tMax
-		&& p.x <= 0.5f && p.x >= -0.5f
-		&& p.z <= 0.5f && p.z >= -0.5f) {
-		glm::vec3 p = transformedRay.at(t);
+		&& p.x <= maxPoint.x && p.x >= minPoint.x
+		&& p.z <= maxPoint.z && p.z >= minPoint.z) {
 		hr.t = t;
-		hr.point = m_obj2World.getMatrix() * glm::vec4(p, 1.0);
-		hr.setFaceNormal(ray, m_obj2World.getTransposeInverse() * glm::fvec4(normal, 0.0f));
+		hr.point = ray.at(t);
+		hr.setFaceNormal(ray, m_obj2World.transformNormal(normal));
 		return true;
 	}
 
@@ -41,8 +40,8 @@ void XZRect::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::ve
 		sampler->getSample() - 0.5
 	);
 	normal = glm::vec3(0.0f, 1.0f, 0.0f);
-	point = m_obj2World.getMatrix() * glm::vec4(point, 1.0);
-	normal = m_obj2World.getTransposeInverse() * glm::fvec4(normal, 0.0f);
+	point = m_obj2World.transformPoint(point);
+	normal = m_obj2World.transformNormal(normal);
 	pdf = 1/area();
 }
 
