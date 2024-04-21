@@ -1,5 +1,4 @@
 #include "core/renderer.hpp"
-#include "plog/Log.h"
 #include "shapes/sphere.hpp"
 #include "shapes/xzrect.hpp"
 #include "shapes/triangle.hpp"

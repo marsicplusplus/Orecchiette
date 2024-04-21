@@ -2,7 +2,6 @@
 #include "core/renderer.hpp"
 #include "core/thread_pool.hpp"
 
-#include "plog/Log.h"
 #include "samplers/xorshift.hpp"
 #include "cameras/perspective.hpp"
 #include "managers/input_manager.hpp"
@@ -122,7 +121,6 @@ Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, s
 	glm::vec3 wi;
 	Ray visibilityRay;
 	auto li = light->li(sampler, hr, visibilityRay, wi, pdf, dist);
-	pdf *= PI * 2.0f;
 	if (scene->visibilityCheck(visibilityRay, EPS, dist - EPS, light))
 	{
 		return glm::dot(hr.normal, wi) * material->brdf(hr, wi) * li / pdf;
@@ -198,7 +196,7 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 bool Renderer::init()
 {
 	glfwInit();
-	PLOG_FATAL_IF(!glfwInit()) << "Cannot Initialize GLFW";
+	glfwInit();
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -217,11 +215,12 @@ bool Renderer::init()
 	{
 		this->window = glfwCreateWindow((opts.width) * opts.scaling, opts.height * opts.scaling, opts.title.c_str(), NULL, NULL);
 	}
-	PLOG_FATAL_IF(this->window == nullptr) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
+	// PLOG_FATAL_IF(this->window == nullptr) << "ERROR::Renderer::initSystems > could not create GLFW3 window;";
 	glfwMakeContextCurrent(this->window);
 	glfwSetKeyCallback(this->window, keyCallback);
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-	PLOG_FATAL_IF(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
+	// PLOG_FATAL_IF(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) << "Failed to initialize GLAD";
+	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	sampler = std::make_shared<XorShift>(time(NULL));
 	framebuffer.init(this->opts.width, this->opts.height);
 	isInitialized = true;

@@ -55,7 +55,7 @@ class Scene {
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
 		std::vector<std::shared_ptr<Emitter>> lights;
-		std::vector<std::shared_ptr<Mat::Material>> materials; /* I still don't know how to handle brfs and materials. Does a material have multiple bdrfs with different weights? */
+		std::vector<std::shared_ptr<Mat::Material>> materials; 
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::shared_ptr<Camera::Camera> camera;
 

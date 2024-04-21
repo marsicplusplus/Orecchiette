@@ -8,13 +8,11 @@ set( GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW lib only" FORCE)
 set( GLFW_INSTALL OFF CACHE BOOL "GLFW lib only" FORCE)
 
 add_subdirectory( external/glfw )
-add_subdirectory( external/plog )
 
 include_directories( 
 	external/glfw/include 
 	external/glad/include
 	external/glm
-	external/plog/include
 	src/
 	include/
 	)
