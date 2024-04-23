@@ -33,7 +33,7 @@ int main(int argv, char* args[]) {
 	scene->addMaterial(std::make_shared<Mat::Emissive>(glm::vec3(1.2, 1.2, 2.8) * 1.0f));				// 2
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.8, 0.8, 0.8)));	// 4
-	scene->addMaterial(std::make_shared<Mat::Emissive>(BLUE * 10.0f));				// 5
+	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 2.0f));				// 5
 
 	// Spheres
 	Transform t1;
@@ -56,10 +56,21 @@ int main(int argv, char* args[]) {
 		2)
 	);
 
-	Transform lightTransform1;
-	lightTransform1.translate(glm::fvec3(-2.2, 2.2, -1.4));
-	scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 5.0f));
+	Transform lightTransform2;
+	lightTransform2.scale(5.0f);	
+	lightTransform2.translate(glm::fvec3(0, 3.5, -3.0));	
+	lightTransform2.rotate(glm::radians(180.0f), glm::vec3(1.0, 0.0, 0.0));	
+	scene->addPrimitive(std::make_shared<Primitive>(
+		std::make_shared<XZRect>(lightTransform2), 
+		5)
+	);
 
+
+	// Transform lightTransform1;
+	// lightTransform1.translate(glm::fvec3(-2.2, 2.2, -1.4));
+	// scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 5.0f));
+
+	// Floor
 	Transform t2;
 	t2.scale(20);
 	scene->addPrimitive(std::make_shared<Primitive>(

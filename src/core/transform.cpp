@@ -11,10 +11,12 @@ Transform::Transform(){
 
 void Transform::scale(float uniform) {
 	scale(uniform, uniform, uniform);
+	updateMatrix();
 }
 
 void Transform::scale(glm::vec3 &sc) {
 	scale(sc.x, sc.y, sc.z);
+	updateMatrix();
 }
 
 void Transform::scale(float x, float y, float z){
@@ -31,6 +33,7 @@ void Transform::rotate(float angle, const glm::vec3 &rotAxis) {
 
 void Transform::translate(const glm::vec3 &tran) {
 	translate(tran.x, tran.y, tran.z);
+	updateMatrix();
 }
 
 void Transform::translate(float x, float y, float z) {

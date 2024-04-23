@@ -148,49 +148,46 @@ Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std
 #define DIRECT
 Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 {
-	HitRecord hr;
-	if (depth > MAX_DEPTH)
-	{
-		return BLACK;
-	}
-	if (scene->traverse(ray, EPS, INF, hr))
-	{
-		auto material = scene->getMaterial(hr.materialIdx);
-		auto primitive = scene->getPrimitive(hr.geomIdx);
-		glm::vec3 Ei = BLACK;	
+	glm::vec3 throughput = glm::vec3(1.0);
+	glm::vec3 color = glm::vec3(0.0);
+	Ray r = ray;
+	for(int depth = 0; depth < MAX_DEPTH; depth++) {
+		HitRecord hr;
+		if (!scene->traverse(r, EPS, INF, hr)){
+			color += throughput * BLACK; // background color, sample skybox;
+			break;
+		} else {
+			auto material = scene->getMaterial(hr.materialIdx);
+			auto primitive = scene->getPrimitive(hr.geomIdx);
 #ifdef DIRECT
-		if (primitive->light != nullptr)
-		{									// We hit a light
-			if(depth == 0)
-				return primitive->light->color; // light->Le();
-			else
-				return BLACK;
-		}
-		auto directLight = sampleLights(sampler, hr, material, primitive->light);
-		float reflectionPdf;
-		glm::vec3 brdf;
-		Ray newRay;
-		material->sample(sampler, ray, newRay, reflectionPdf, brdf, hr);
-		Ei = brdf * glm::dot(hr.normal, newRay.direction) * trace(newRay, lastSpecular, depth + 1) / reflectionPdf;
-		return (Ei + directLight);
+			if (primitive->light != nullptr)
+			{ // We hit a light
+				if (depth == 0)
+					color += throughput * primitive->light->color; // light->Le();
+				break;
+			}
+			color += throughput * sampleLights(sampler, hr, material, primitive->light);
+			float reflectionPdf;
+			glm::vec3 brdf;
+			Ray newRay;
+			material->sample(sampler, r, newRay, reflectionPdf, brdf, hr);
+			throughput = brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
+			r = newRay;
 #else
-		if (primitive->light != nullptr)
-		{									// We hit a light
-			return primitive->light->color; // light->Le();
-		}
-		float reflectionPdf;
-		glm::vec3 brdf;
-		Ray newRay;
-		material->sample(sampler, ray, newRay, reflectionPdf, brdf, hr);
-		Ei = trace(newRay, lastSpecular, depth + 1) / reflectionPdf;
-		return brdf * glm::dot(hr.normal, newRay.direction) * Ei;
+			if (primitive->light != nullptr)
+			{									// We hit a light
+				color += throughput * primitive->light->color; // light->Le();
+			}
+			float reflectionPdf;
+			glm::vec3 brdf;
+			Ray newRay;
+			material->sample(sampler, r, newRay, reflectionPdf, brdf, hr);
+			throughput *= brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
+			r = newRay;
 #endif
+		}
 	}
-	else
-	{
-		// No hit
-		return BLACK;
-	}
+	return color;
 }
 
 bool Renderer::init()

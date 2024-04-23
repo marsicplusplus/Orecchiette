@@ -25,7 +25,7 @@ bool XZRect::hit(const Ray &ray, const float tMin, const float tMax, HitRecord &
 		&& p.x <= maxPoint.x && p.x >= minPoint.x
 		&& p.z <= maxPoint.z && p.z >= minPoint.z) {
 		hr.t = t;
-		hr.point = ray.at(t);
+		hr.point = m_obj2World.transformPoint(transformedRay.at(t));
 		hr.setFaceNormal(ray, m_obj2World.transformNormal(normal));
 		return true;
 	}
