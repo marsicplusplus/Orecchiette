@@ -57,7 +57,8 @@ int main(int argv, char* args[]) {
 	);
 
 	Transform lightTransform1;
-	lightTransform1.translate(glm::fvec3(0.2, 2.2, -1.4));
+	lightTransform1.translate(glm::fvec3(-2.2, 2.2, -1.4));
+	scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 5.0f));
 
 	Transform t2;
 	t2.scale(20);

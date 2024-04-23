@@ -73,7 +73,7 @@ void Sphere::sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::ve
 	glm::vec3 local = sampleUniformSphere(sampler);
 	normal = glm::normalize(local);
 	point = m_obj2World.transformPoint(radius * local);
-	pdf = 2.0f * PI / area();
+	pdf = 2.0 * PI / A;
 }
 
 BoundingBox Sphere::getBBox() const

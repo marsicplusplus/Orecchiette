@@ -14,8 +14,9 @@ glm::vec3 Area::li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, 
 	vRay.direction = wi;
 	float cosT = glm::dot(sampleNormal, -wi);
 	auto solidAngle = (cosT * this->area()) / (dist * dist);
+	pdf = 1.0 / solidAngle;
 	if(cosT > 0.0f) {
-    	return this->color * solidAngle;
+    	return this->color;
 	} else {
 		return BLACK;
 	}
