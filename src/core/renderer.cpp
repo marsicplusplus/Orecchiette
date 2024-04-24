@@ -146,15 +146,16 @@ Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std
 
 // #define INDIRECT
 #define DIRECT
-Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
+Color Renderer::trace(const Ray &ray)
 {
 	glm::vec3 throughput = glm::vec3(1.0);
 	glm::vec3 color = glm::vec3(0.0);
+	bool lastSpecular = false;
 	Ray r = ray;
 	for(int depth = 0; depth < MAX_DEPTH; depth++) {
 		HitRecord hr;
 		if (!scene->traverse(r, EPS, INF, hr)){
-			color += throughput * BLACK; // background color, sample skybox;
+			color += throughput * glm::vec3(0.0, 0.05, 0.1); // background color, sample skybox;
 			break;
 		} else {
 			auto material = scene->getMaterial(hr.materialIdx);
@@ -162,10 +163,13 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 #ifdef DIRECT
 			if (primitive->light != nullptr)
 			{ // We hit a light
-				if (depth == 0)
+				if (depth == 0 || lastSpecular) {
 					color += throughput * primitive->light->color; // light->Le();
+					lastSpecular = false;
+				}
 				break;
 			}
+			if(material->getType() == Mat::MIRROR) lastSpecular = true;
 			color += throughput * sampleLights(sampler, hr, material, primitive->light);
 			float reflectionPdf;
 			glm::vec3 brdf;
@@ -185,6 +189,12 @@ Color Renderer::trace(const Ray &ray, float lastSpecular, uint32_t depth)
 			throughput *= brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 			r = newRay;
 #endif
+			// Russian Roulette:
+			if(depth > 3) {
+				float p = std::max(throughput.x, std::max(throughput.y, throughput.z));
+				if(sampler->getSample() > p) break;
+				throughput = throughput * 1.0f/p;
+			}	
 		}
 	}
 	return color;

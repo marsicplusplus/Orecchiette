@@ -24,7 +24,7 @@ class Renderer{
 
 	private:
 		void drawGUI();
-		Color trace(const Ray &ray, float lastSpecular = 1, uint32_t depth = 0);
+		Color trace(const Ray &ray);
 		Color sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight);
 		Color estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light);
 

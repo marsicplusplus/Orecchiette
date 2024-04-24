@@ -5,6 +5,7 @@
 #include "cameras/perspective.hpp"
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
+#include "materials/mirror.hpp"
 #include "emitters/point_light.hpp"
 #include "emitters/spot_light.hpp"
 #include "emitters/directional.hpp"
@@ -28,7 +29,7 @@ int main(int argv, char* args[]) {
 	}
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
-	scene->addMaterial(std::make_shared<Mat::Diffuse>(RED));						// 0
+	scene->addMaterial(std::make_shared<Mat::Mirror>(WHITE));						// 0
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(2.7, 2.5, 2.7)));	// 1
 	scene->addMaterial(std::make_shared<Mat::Emissive>(glm::vec3(1.2, 1.2, 2.8) * 1.0f));				// 2
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
