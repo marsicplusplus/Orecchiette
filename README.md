@@ -1,3 +1,4 @@
+<img src="./current_status.png" />
 # Orecchiette
 Real Time Path Tracer, please read this README!
 

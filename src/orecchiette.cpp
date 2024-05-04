@@ -35,8 +35,8 @@ int main(int argv, char* args[]) {
 	scene->addMaterial(std::make_shared<Mat::Emissive>(glm::vec3(1.2, 1.2, 2.8) * 1.0f));				// 2
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.8, 0.8, 0.8)));	// 4
-	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 3.0f));				// 5
-	scene->addMaterial(std::make_shared<Mat::Dielectric>(WHITE, 1.5f));				// 6 GLASS
+	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 1.0f));				// 5
+	scene->addMaterial(std::make_shared<Mat::Dielectric>(glm::vec3(1.0, 1.0, 1.0), 1.49f));				// 6 GLASS
 
 	// Spheres
 	Transform t1;
@@ -67,27 +67,22 @@ int main(int argv, char* args[]) {
 		0)
 	);
 
-	// Transform lightTransform;
-	// lightTransform.translate(glm::fvec3(2.4, 1.0, -4.5));	
-	// scene->addPrimitive(std::make_shared<Primitive>(
-	// 	std::make_shared<Sphere>(lightTransform, 0.5), 
-	// 	5)
-	// );
-
 	// Lights
 	Transform lightTransform2;
-	lightTransform2.scale(7.0f);	
-	lightTransform2.translate(glm::fvec3(-4.5, 3.5, -3.0));	
+	lightTransform2.scale(5.0f);	
+	lightTransform2.translate(glm::fvec3(-4.5, 1.0, -3.0));	
 	lightTransform2.rotate(glm::radians(-90.0f), glm::vec3(0.0, 0.0, 1.0));	
 	scene->addPrimitive(std::make_shared<Primitive>(
 		std::make_shared<XZRect>(lightTransform2), 
 		5)
 	);
-
-
-	// Transform lightTransform1;
-	// lightTransform1.translate(glm::fvec3(-0.2, 2.2, -1.4));
-	// scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 10.0f));
+	
+	Transform lightTransform;
+	lightTransform.translate(glm::fvec3(2.4, 4.0, -4.5));	
+	scene->addPrimitive(std::make_shared<Primitive>(
+		std::make_shared<Sphere>(lightTransform, 0.5), 
+		5)
+	);
 
 	// Floor
 	Transform t2;
