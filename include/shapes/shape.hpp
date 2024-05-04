@@ -15,7 +15,13 @@ class Shape {
 		virtual void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const = 0;
 		virtual float area() const = 0;
 		virtual BoundingBox getBBox() const = 0;
-		float pdf(HitRecord hr, const glm::vec3 &wi) const { return 1.0 / area(); }
+		virtual float pdf(const HitRecord &hr, const glm::vec3 &wi) const { 
+			Ray r = Ray(hr.point + wi * EPS, wi);
+			HitRecord hrLight;
+			if(!this->hit(r, 0, INF, hrLight)) return 0;
+			return glm::distance2(hrLight.point, hr.point) 
+					/ (abs(glm::dot(hrLight.normal, -wi)) * area());
+		}
 
 
     protected:

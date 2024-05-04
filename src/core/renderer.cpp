@@ -6,13 +6,13 @@
 #include "cameras/perspective.hpp"
 #include "managers/input_manager.hpp"
 
-#define MAX_DEPTH 5
-#define BG_COLOR BLACK
-// #define BG_COLOR glm::vec3(0.07, 0.08, 0.18)
-#define MAX_SPP 5 			/* Maximum number of sample per pixel per frame. If 0, never stop the accumulation*/
+#define MAX_DEPTH 10
+// #define BG_COLOR BLACK
+#define BG_COLOR glm::vec3(0.07, 0.08, 0.18)
+#define MAX_SPP 0 			/* Maximum number of sample per pixel per frame. If 0, never stop the accumulation*/
 // #define INDIRECT 		/* Naive PT */
 #define DIRECT				/* Enable Next Event Estimation */
-// #define MIS 				/* Enable Multiple Importance Sampling */
+#define MIS 				/* Enable Multiple Importance Sampling */
 
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -133,45 +133,43 @@ inline float powerHeuristic(int nf, float fPdf, int ng, float gPdf) {
 
 Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light)
 {
-	auto directL = BLACK;
-	float lightPdf, dist;
+	glm::vec3 directL = BLACK, brdf;
+	float lightPdf, brdfPdf, dist;
 	glm::vec3 wi;
 	Ray visibilityRay;
 	auto ld = BLACK;
 	auto li = light->li(sampler, hr, visibilityRay, wi, lightPdf, dist);
 	// MIS, Sample Direct Light (if material is non specular)
-	if(material->getType() != Mat::MaterialType::DIELECTRIC && material->getType() != Mat::MaterialType::MIRROR) { // Replace with a better check to avoid the longest if statement in the world
-		if(lightPdf != 0 && li != BLACK & scene->visibilityCheck(visibilityRay, EPS, dist - EPS, light)) {
-			auto brdf = material->brdf(hr, wi);
-			float weight = 1.0f;
-			if(!light->isDelta()) {
-				auto brdfPdf = material->pdf(hr, wi);
-				weight = powerHeuristic(1, lightPdf, 1, brdfPdf);
+	if(lightPdf != 0 && li != BLACK ) {
+		brdf = material->brdf(hr, wi);
+		brdfPdf = material->pdf(hr, wi);
+		if(brdf != BLACK) {
+			if(scene->visibilityCheck(visibilityRay, EPS, dist - EPS, light)) {
+				float weight = 1.0f;
+				if(!light->isDelta()) {
+					weight = powerHeuristic(1, lightPdf, 1, brdfPdf);
+				}
+				ld += glm::dot(hr.normal, wi) * brdf * weight * li / lightPdf;
 			}
-			ld = glm::dot(hr.normal, wi) * brdf * weight * li / lightPdf;
 		}
 	}
 	// MIS, Sample BRDF
 	if(!light->isDelta()) {
-		// ld = BLACK;
-		float brdfPdf;
-		glm::vec3 brdf;
 		Ray wiRay;
 		material->sample(sampler, in, wiRay, brdfPdf, brdf, hr);
 		li = BLACK;
 		if(brdfPdf != 0.0 && brdf != BLACK) {
-			// lightPdf = light->pdf(hr, wi);
-			if(lightPdf == 0.0) return ld;
 			float weight = 1.0f;
 			if(material->getType() != Mat::MaterialType::DIELECTRIC && material->getType() != Mat::MaterialType::MIRROR){
+				lightPdf = light->pdf(hr, wiRay.direction);
+				if(lightPdf == 0.0) return ld;
 				weight = powerHeuristic(1, brdfPdf, 1, lightPdf);
 			}
 			HitRecord lightHr;
-			if(this->scene->traverse(wiRay, 0.01, INFINITY, lightHr)){
+			if(this->scene->traverse(wiRay, 0.0, INFINITY, lightHr)){
 				auto hitLight = scene->getPrimitive(lightHr.geomIdx)->light;
 				if(hitLight != nullptr && hitLight == light) {
 					li = glm::dot(lightHr.normal, -wiRay.direction) > 0.0 ? light->color : BLACK;
-					// li = light->color;
 				} 
 			}
 			ld += glm::dot(hr.normal, wiRay.direction) * brdf * weight * li / brdfPdf;
@@ -238,6 +236,12 @@ Color Renderer::trace(const Ray &ray)
 			material->sample(sampler, r, newRay, reflectionPdf, brdf, hr);
 			throughput = brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 			r = newRay;
+			// Russian Roulette:
+			if(depth > 3) {
+				float p = std::max(throughput.x, std::max(throughput.y, throughput.z));
+				if(sampler->getSample() > p) break;
+				throughput = throughput * 1.0f/p;
+			}
 #else
 			if (primitive->light != nullptr)
 			{									// We hit a light
@@ -249,13 +253,7 @@ Color Renderer::trace(const Ray &ray)
 			material->sample(sampler, r, newRay, reflectionPdf, brdf, hr);
 			throughput *= brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 			r = newRay;
-#endif
-			// Russian Roulette:
-			if(depth > 3) {
-				float p = std::max(throughput.x, std::max(throughput.y, throughput.z));
-				if(sampler->getSample() > p) break;
-				throughput = throughput * 1.0f/p;
-			}	
+#endif	
 		}
 	}
 	return color;
