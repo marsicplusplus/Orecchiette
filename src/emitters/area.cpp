@@ -21,3 +21,22 @@ glm::vec3 Area::li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, 
 		return BLACK;
 	}
 }
+
+glm::vec3 Area::Le(const Ray &ray, float dist, float &pdf) const{
+	HitRecord hr;
+	auto ret = BLACK;
+	if(this->shape->hit(ray, 0.001, dist - 0.001, hr)){ 
+		float cosT = glm::dot(hr.normal, -ray.direction);
+		auto solidAngle = (cosT * this->area()) / (dist * dist);
+		pdf = 1.0 / solidAngle;
+		ret = cosT > 0.0 ? this->color : BLACK;
+	} else {
+		pdf = 0.0;
+		ret = BLACK;
+	}
+	return ret;
+}
+
+float Area::pdf(const HitRecord &hr, const glm::vec3 &wi) const {
+	return shape->pdf(hr, wi);
+}

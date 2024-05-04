@@ -20,6 +20,8 @@ class Ray {
 
 		glm::vec3 origin;
 		glm::vec3 direction;
+		float currentEta;
+		bool lastSpecular = false;
 	private:
 };
 

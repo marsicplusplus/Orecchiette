@@ -47,8 +47,12 @@ namespace Mat
 		return true;
 	}
 
-	glm::vec3 Diffuse::brdf(const HitRecord &hr, glm::vec3 wi)
+	glm::vec3 Diffuse::brdf(const HitRecord &hr, const glm::vec3 &wi) const
 	{
 		return this->albedo * ONE_OVER_PI;
 	}
+
+	float Diffuse::pdf(const HitRecord &hr, const glm::vec3 &wi) const {
+		return glm::dot(hr.normal, wi) * ONE_OVER_PI;
+    }
 }

@@ -3,6 +3,7 @@
 #include "shapes/xzrect.hpp"
 #include "shapes/triangle.hpp"
 #include "cameras/perspective.hpp"
+#include "materials/dielectric.hpp"
 #include "materials/emissive.hpp"
 #include "materials/diffuse.hpp"
 #include "materials/mirror.hpp"
@@ -30,17 +31,18 @@ int main(int argv, char* args[]) {
 	std::shared_ptr<Scene> scene = std::make_shared<Scene>();
 
 	scene->addMaterial(std::make_shared<Mat::Mirror>(WHITE));						// 0
-	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(2.7, 2.5, 2.7)));	// 1
+	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.7, 0.5, 0.7)));	// 1
 	scene->addMaterial(std::make_shared<Mat::Emissive>(glm::vec3(1.2, 1.2, 2.8) * 1.0f));				// 2
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.8, 0.8, 0.8)));	// 4
-	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 2.0f));				// 5
+	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 3.0f));				// 5
+	scene->addMaterial(std::make_shared<Mat::Dielectric>(WHITE, 1.5f));				// 6 GLASS
 
 	// Spheres
 	Transform t1;
 	t1.translate(-1.5f, 1.0f, -3.0f);
 	std::shared_ptr sphereShape1 = std::make_shared<Sphere>(t1, 1.0);
-	std::shared_ptr<Primitive> sphere1 = std::make_shared<Primitive>(sphereShape1, 0);
+	std::shared_ptr<Primitive> sphere1 = std::make_shared<Primitive>(sphereShape1, 6);
 	scene->addPrimitive(sphere1);
 	Transform transf;
 	transf.translate(glm::vec3(1.4f, 0.8f, -1.4));
@@ -48,19 +50,35 @@ int main(int argv, char* args[]) {
 		std::make_shared<Primitive>(std::make_shared<Sphere>(transf, 0.8), 
 		3)
 	);
-
-	// Lights
-	Transform lightTransform;
-	lightTransform.translate(glm::fvec3(2, 1.0, -4.0));	
+	Transform sphereTransform;
+	sphereTransform.translate(glm::fvec3(-2.4, 1.0, -4.5));	
 	scene->addPrimitive(std::make_shared<Primitive>(
-		std::make_shared<Sphere>(lightTransform, 1.0), 
-		2)
+		std::make_shared<Sphere>(sphereTransform, 1.0), 
+		1)
 	);
 
+	Transform mirrorTran;
+	mirrorTran.scale(3.0f);	
+	mirrorTran.translate(glm::fvec3(4.5, 1.5, -4.0));	
+	mirrorTran.rotate(glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	
+	mirrorTran.rotate(glm::radians(35.0f), glm::vec3(1.0, 0.0, 0.0));	
+	scene->addPrimitive(std::make_shared<Primitive>(
+		std::make_shared<XZRect>(mirrorTran), 
+		0)
+	);
+
+	// Transform lightTransform;
+	// lightTransform.translate(glm::fvec3(2.4, 1.0, -4.5));	
+	// scene->addPrimitive(std::make_shared<Primitive>(
+	// 	std::make_shared<Sphere>(lightTransform, 0.5), 
+	// 	5)
+	// );
+
+	// Lights
 	Transform lightTransform2;
-	lightTransform2.scale(5.0f);	
-	lightTransform2.translate(glm::fvec3(0, 3.5, -3.0));	
-	lightTransform2.rotate(glm::radians(180.0f), glm::vec3(1.0, 0.0, 0.0));	
+	lightTransform2.scale(7.0f);	
+	lightTransform2.translate(glm::fvec3(-4.5, 3.5, -3.0));	
+	lightTransform2.rotate(glm::radians(-90.0f), glm::vec3(0.0, 0.0, 1.0));	
 	scene->addPrimitive(std::make_shared<Primitive>(
 		std::make_shared<XZRect>(lightTransform2), 
 		5)
@@ -68,8 +86,8 @@ int main(int argv, char* args[]) {
 
 
 	// Transform lightTransform1;
-	// lightTransform1.translate(glm::fvec3(-2.2, 2.2, -1.4));
-	// scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 5.0f));
+	// lightTransform1.translate(glm::fvec3(-0.2, 2.2, -1.4));
+	// scene->addLight(std::make_shared<PointLight>(lightTransform1, WHITE * 10.0f));
 
 	// Floor
 	Transform t2;

@@ -5,5 +5,6 @@ namespace Mat {
 		public:
 			Emissive(const Color &albedo = WHITE);
 			MaterialType getType() const;
+			float pdf(const HitRecord &hr, const glm::vec3 &wi) const override {return 0.0;}
 	};
 };

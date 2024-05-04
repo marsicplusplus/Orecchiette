@@ -18,13 +18,18 @@ namespace Mat
 	{
         reflectedRay.direction = glm::reflect(in.direction, hr.normal);
         reflectedRay.origin = hr.point + reflectedRay.direction * 0.01f;
+		reflectedRay.lastSpecular = true;
         brdf = this->albedo;
         pdf = 1.0;
         return true;
 	}
 
-	glm::vec3 Mirror::brdf(const HitRecord &hr, glm::vec3 wi)
+	glm::vec3 Mirror::brdf(const HitRecord &hr, const glm::vec3 &wi) const
 	{
 		return glm::vec3(0.0f);
 	}
+
+	float Mirror::pdf(const HitRecord &hr, const glm::vec3 &wi) const {
+        return 0.0;
+    }
 }

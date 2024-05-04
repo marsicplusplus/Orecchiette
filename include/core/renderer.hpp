@@ -25,8 +25,8 @@ class Renderer{
 	private:
 		void drawGUI();
 		Color trace(const Ray &ray);
-		Color sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight);
-		Color estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light);
+		Color sampleLights(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight);
+		Color estimateDirect(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light);
 
 		GLFWwindow *window;
 		Framebuffer framebuffer;

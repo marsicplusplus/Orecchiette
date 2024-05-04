@@ -8,6 +8,13 @@
 
 #include <memory>
 
+enum EmitterType {
+	AREA 		= 0,
+	POINT 		= 1,
+	SPOT 		= 2,
+	DIRECTIONAL = 3,
+};
+
 class Emitter {
 	public:
 		Emitter(Color emission) : color(emission) {
@@ -17,6 +24,13 @@ class Emitter {
 			o2w(o2w), color(emission) {}
 		virtual glm::vec3 li(std::shared_ptr<Sampler> &sampler, HitRecord &hr, Ray &vRay, glm::vec3 &wi, float &pdf, float &dist) const = 0;
 		virtual void preprocess(BoundingBox bbox) {};
+		virtual bool isDelta() { return true; }
+		virtual float pdf(const HitRecord &hr, const glm::vec3 &wi) const {
+			return 0.0;
+		}
+		virtual glm::vec3 Le(const Ray &ray, float dist, float &pdf) const {
+			return BLACK;
+		}
 
 		Color color;
 	protected:

@@ -7,6 +7,13 @@
 #include "managers/input_manager.hpp"
 
 #define MAX_DEPTH 5
+#define BG_COLOR BLACK
+// #define BG_COLOR glm::vec3(0.07, 0.08, 0.18)
+#define MAX_SPP 5 			/* Maximum number of sample per pixel per frame. If 0, never stop the accumulation*/
+// #define INDIRECT 		/* Naive PT */
+#define DIRECT				/* Enable Next Event Estimation */
+// #define MIS 				/* Enable Multiple Importance Sampling */
+
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
@@ -61,43 +68,45 @@ void Renderer::start()
 		{
 			this->nFrames++;
 		}
-		std::vector<std::future<void>> futures;
-		for (int tileRow = 0; tileRow < verticalTiles; ++tileRow)
-		{
-			for (int tileCol = 0; tileCol < horizontalTiles; ++tileCol)
+		if(nFrames < MAX_SPP || MAX_SPP == 0) {
+			std::vector<std::future<void>> futures;
+			for (int tileRow = 0; tileRow < verticalTiles; ++tileRow)
 			{
-				futures.push_back(Threading::pool.queue([&, tileRow, tileCol, spp](std::shared_ptr<Sampler> sampler)
-														{
-					for (int row = 0; row < tHeight; ++row)
-					{
-						for (int col = 0; col < tWidth; ++col)
+				for (int tileCol = 0; tileCol < horizontalTiles; ++tileCol)
+				{
+					futures.push_back(Threading::pool.queue([&, tileRow, tileCol, spp](std::shared_ptr<Sampler> sampler)
+															{
+						for (int row = 0; row < tHeight; ++row)
 						{
-							int x = col + tWidth * tileCol;
-							int y = row + tHeight * tileRow;
-							int idx = wWidth * y + x;
-							Color c = BLACK;
-							for (int i = 0; i < spp; ++i)
+							for (int col = 0; col < tWidth; ++col)
 							{
-								Ray ray;
-								if (scene)
+								int x = col + tWidth * tileCol;
+								int y = row + tHeight * tileRow;
+								int idx = wWidth * y + x;
+								Color c = BLACK;
+								for (int i = 0; i < spp; ++i)
 								{
-									scene->getCamera()->getCameraRay(x, y, &ray, sampler);
-									c += trace(ray);
+									Ray ray;
+									if (scene)
+									{
+										scene->getCamera()->getCameraRay(x, y, &ray, sampler);
+										c += trace(ray);
+									}
+									else
+									{
+										auto t = 0.5f * (row + 1.0f);
+										c += (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7, 1.0);
+									}
 								}
-								else
-								{
-									auto t = 0.5f * (row + 1.0f);
-									c += (1.0f - t) * glm::vec3(1.0, 1.0, 1.0) + t * glm::vec3(0.5, 0.7, 1.0);
-								}
+								framebuffer.putPixel(idx, c / (float)spp, nFrames);
 							}
-							framebuffer.putPixel(idx, c / (float)spp, nFrames);
-						}
-					} }));
+						} }));
+				}
 			}
-		}
-		for (auto &f : futures)
-		{
-			f.get();
+			for (auto &f : futures)
+			{
+				f.get();
+			}
 		}
 		float now = glfwGetTime();
 		frameTime = now - lastUpdateTime;
@@ -115,7 +124,63 @@ void Renderer::start()
 	}
 }
 
-Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light)
+#ifdef MIS
+
+inline float powerHeuristic(int nf, float fPdf, int ng, float gPdf) {
+	float f = nf * fPdf, g = ng * gPdf;
+    return (f * f) / (f * f + g * g);
+}
+
+Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light)
+{
+	auto directL = BLACK;
+	float lightPdf, dist;
+	glm::vec3 wi;
+	Ray visibilityRay;
+	auto ld = BLACK;
+	auto li = light->li(sampler, hr, visibilityRay, wi, lightPdf, dist);
+	// MIS, Sample Direct Light (if material is non specular)
+	if(material->getType() != Mat::MaterialType::DIELECTRIC && material->getType() != Mat::MaterialType::MIRROR) { // Replace with a better check to avoid the longest if statement in the world
+		if(lightPdf != 0 && li != BLACK & scene->visibilityCheck(visibilityRay, EPS, dist - EPS, light)) {
+			auto brdf = material->brdf(hr, wi);
+			float weight = 1.0f;
+			if(!light->isDelta()) {
+				auto brdfPdf = material->pdf(hr, wi);
+				weight = powerHeuristic(1, lightPdf, 1, brdfPdf);
+			}
+			ld = glm::dot(hr.normal, wi) * brdf * weight * li / lightPdf;
+		}
+	}
+	// MIS, Sample BRDF
+	if(!light->isDelta()) {
+		// ld = BLACK;
+		float brdfPdf;
+		glm::vec3 brdf;
+		Ray wiRay;
+		material->sample(sampler, in, wiRay, brdfPdf, brdf, hr);
+		li = BLACK;
+		if(brdfPdf != 0.0 && brdf != BLACK) {
+			// lightPdf = light->pdf(hr, wi);
+			if(lightPdf == 0.0) return ld;
+			float weight = 1.0f;
+			if(material->getType() != Mat::MaterialType::DIELECTRIC && material->getType() != Mat::MaterialType::MIRROR){
+				weight = powerHeuristic(1, brdfPdf, 1, lightPdf);
+			}
+			HitRecord lightHr;
+			if(this->scene->traverse(wiRay, 0.01, INFINITY, lightHr)){
+				auto hitLight = scene->getPrimitive(lightHr.geomIdx)->light;
+				if(hitLight != nullptr && hitLight == light) {
+					li = glm::dot(lightHr.normal, -wiRay.direction) > 0.0 ? light->color : BLACK;
+					// li = light->color;
+				} 
+			}
+			ld += glm::dot(hr.normal, wiRay.direction) * brdf * weight * li / brdfPdf;
+		}
+	}
+	return ld;
+}
+#else
+Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> light)
 {
 	float pdf, dist;
 	glm::vec3 wi;
@@ -127,8 +192,9 @@ Color Renderer::estimateDirect(std::shared_ptr<Sampler> sampler, HitRecord hr, s
 	}
 	return BLACK;
 }
+#endif
 
-Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight)
+Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, const Ray &in, HitRecord hr, std::shared_ptr<Mat::Material> material, std::shared_ptr<Emitter> hitLight)
 {
 	std::shared_ptr<Emitter> light;
 	uint64_t lightIdx = 0;
@@ -141,21 +207,18 @@ Color Renderer::sampleLights(std::shared_ptr<Sampler> sampler, HitRecord hr, std
 			break;
 	}
 	float pdf = 1.0f / scene->numberOfLights();
-	return estimateDirect(sampler, hr, material, light) / pdf;
+	return estimateDirect(sampler, in, hr, material, light) / pdf;
 }
 
-// #define INDIRECT
-#define DIRECT
 Color Renderer::trace(const Ray &ray)
 {
 	glm::vec3 throughput = glm::vec3(1.0);
 	glm::vec3 color = glm::vec3(0.0);
-	bool lastSpecular = false;
 	Ray r = ray;
 	for(int depth = 0; depth < MAX_DEPTH; depth++) {
 		HitRecord hr;
 		if (!scene->traverse(r, EPS, INF, hr)){
-			color += throughput * glm::vec3(0.0, 0.05, 0.1); // background color, sample skybox;
+			color += throughput * BG_COLOR; // background color, sample skybox;
 			break;
 		} else {
 			auto material = scene->getMaterial(hr.materialIdx);
@@ -163,14 +226,12 @@ Color Renderer::trace(const Ray &ray)
 #ifdef DIRECT
 			if (primitive->light != nullptr)
 			{ // We hit a light
-				if (depth == 0 || lastSpecular) {
+				if (depth == 0 || r.lastSpecular) {
 					color += throughput * primitive->light->color; // light->Le();
-					lastSpecular = false;
 				}
 				break;
 			}
-			if(material->getType() == Mat::MIRROR) lastSpecular = true;
-			color += throughput * sampleLights(sampler, hr, material, primitive->light);
+			color += throughput * sampleLights(sampler, r, hr, material, primitive->light);
 			float reflectionPdf;
 			glm::vec3 brdf;
 			Ray newRay;
