@@ -6,6 +6,7 @@
 #include "emitters/emitter.hpp"
 #include "cameras/camera.hpp"
 #include "core/defs.hpp"
+#include "core/bvh.hpp"
 #include "textures/texture.hpp"
 #include "materials/material.hpp"
 
@@ -51,6 +52,7 @@ class Scene {
 
 		bool update(float dt);
 		void preprocessLights();
+		void buildBVH();
 
 	private:
 		std::vector<std::shared_ptr<Primitive>> primitives;
@@ -58,6 +60,7 @@ class Scene {
 		std::vector<std::shared_ptr<Mat::Material>> materials; 
 		std::vector<std::shared_ptr<Texture>> textures;
 		std::shared_ptr<Camera::Camera> camera;
+		std::unique_ptr<BVH> bvh;
 
 		BoundingBox *m_bbox;
 };

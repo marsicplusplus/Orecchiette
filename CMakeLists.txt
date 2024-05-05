@@ -27,6 +27,7 @@ set( SRC
 	 src/core/framebuffer.cpp
 	 src/core/OrthonormalBasis.cpp
 	 src/core/ray.cpp
+	 src/core/bvh.cpp
 	 src/core/transform.cpp
 	 src/core/options.cpp
 	 src/core/scene.cpp

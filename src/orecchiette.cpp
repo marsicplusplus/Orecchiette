@@ -35,7 +35,7 @@ int main(int argv, char* args[]) {
 	scene->addMaterial(std::make_shared<Mat::Emissive>(glm::vec3(1.2, 1.2, 2.8) * 1.0f));				// 2
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(GREEN));						// 3
 	scene->addMaterial(std::make_shared<Mat::Diffuse>(glm::vec3(0.8, 0.8, 0.8)));	// 4
-	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 1.0f));				// 5
+	scene->addMaterial(std::make_shared<Mat::Emissive>(WHITE * 3.0f));				// 5
 	scene->addMaterial(std::make_shared<Mat::Dielectric>(glm::vec3(1.0, 1.0, 1.0), 1.49f));				// 6 GLASS
 
 	// Spheres

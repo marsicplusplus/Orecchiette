@@ -3,10 +3,10 @@
 #include "emitters/area.hpp"
 #include <iostream>
 
-Scene::Scene() : m_bbox(nullptr) {/*TODO empty/default scene?*/
+Scene::Scene() : m_bbox(nullptr), bvh(nullptr) {/*TODO empty/default scene?*/
 	/* Create default empty material */
 }
-Scene::Scene(const std::string &fp) : m_bbox(nullptr) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
+Scene::Scene(const std::string &fp) : m_bbox(nullptr), bvh(nullptr) {/*TODO parse scene file? Maybe use the same json format of Tracey;*/}
 
 int Scene::numberOfLights() const {
 	return lights.size();
@@ -34,7 +34,15 @@ bool Scene::visibilityCheck(const Ray &ray, const float tMin, const float tMax, 
 	return true;
 }
 
-bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec) {
+void Scene::buildBVH() {
+	if(this->bvh == nullptr) {
+		std::cout << "Building the BVH" << std::endl;
+		bvh = std::make_unique<BVH>();
+		bvh->buildBVH(this->primitives);
+	}
+}
+
+bool Scene::traverse(const Ray &ray, const float tMin, const float tMax, HitRecord &rec) {	
 	HitRecord tmp;
 	tmp.point = {INF, INF, INF};
 	bool hasHit = false;

@@ -16,6 +16,10 @@ class Primitive {
 		void sample(std::shared_ptr<Sampler> &sampler, glm::vec3 &point, glm::vec3 &normal, float &pdf) const;
 		float area() const;
 		BoundingBox getBBox() const;
+		glm::vec3 centroid() const {
+			const auto bbox = getBBox();
+			return 0.5f * bbox.min + 0.5f * bbox.max;
+		}
 
 		int material;
 		std::shared_ptr<Emitter> light = 0;

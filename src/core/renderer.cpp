@@ -7,12 +7,12 @@
 #include "managers/input_manager.hpp"
 
 #define MAX_DEPTH 10
-// #define BG_COLOR BLACK
-#define BG_COLOR glm::vec3(0.07, 0.08, 0.18)
+#define BG_COLOR BLACK
+// #define BG_COLOR glm::vec3(0.07, 0.08, 0.18)
 #define MAX_SPP 0 			/* Maximum number of sample per pixel per frame. If 0, never stop the accumulation*/
 // #define INDIRECT 		/* Naive PT */
 #define DIRECT				/* Enable Next Event Estimation */
-#define MIS 				/* Enable Multiple Importance Sampling */
+// #define MIS 				/* Enable Multiple Importance Sampling */
 
 
 void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
@@ -47,6 +47,7 @@ void Renderer::start()
 	const int spp = this->opts.spp;
 
 	this->scene->preprocessLights();
+	this->scene->buildBVH();
 
 	while (!glfwWindowShouldClose(this->window))
 	{
@@ -234,6 +235,7 @@ Color Renderer::trace(const Ray &ray)
 			glm::vec3 brdf;
 			Ray newRay;
 			material->sample(sampler, r, newRay, reflectionPdf, brdf, hr);
+			brdf = BLACK;
 			throughput = brdf * glm::dot(hr.normal, newRay.direction) / reflectionPdf;
 			r = newRay;
 			// Russian Roulette:
